@@ -11,7 +11,7 @@ import QuickViewModal from './QuickViewModal';
 // DEMO: React.memo
 // This prevents the card from re-rendering if the 'product' and 'delay' props are the same.
 // Extremely useful in long lists where parent state changes (like search typing).
-const ProductCard = memo(({ product, delay = 0 }) => {
+const ProductCard = memo(({ product, delay = 0, priority = false }) => {
   const { openModal } = useModal();
 
   if (!product) return null;
@@ -29,7 +29,7 @@ const ProductCard = memo(({ product, delay = 0 }) => {
     >
       <div className="relative block">
         <Link to={`/products/${product.handle}`} className="cursor-pointer block" tabIndex="-1" aria-hidden="true">
-          <ProductMedia image={product.images?.[0]} title={product.title} />
+          <ProductMedia image={product.images?.[0]} title={product.title} priority={priority} />
         </Link>
         
         {/* Quick View Button */}

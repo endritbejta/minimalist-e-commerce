@@ -246,6 +246,8 @@ function HeroBanner() {
                 alt=""
                 className="h-full w-full object-cover"
                 draggable="false"
+                loading={slide.id === 1 ? "eager" : "lazy"}
+                {...(slide.id === 1 ? { fetchpriority: "high" } : {})}
               />
             </picture>
 

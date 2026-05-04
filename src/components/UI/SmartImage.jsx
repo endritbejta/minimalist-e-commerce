@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import ImageLoader from './ImageLoader';
 
-const SmartImage = ({ src, alt, className = "", imgClassName = "" }) => {
+const SmartImage = ({ 
+  src, 
+  alt, 
+  className = "", 
+  imgClassName = "",
+  priority = false
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const prevSrc = React.useRef(src);
 
@@ -24,6 +30,8 @@ const SmartImage = ({ src, alt, className = "", imgClassName = "" }) => {
         src={src}
         alt={alt}
         onLoad={() => setIsLoading(false)}
+        loading={priority ? "eager" : "lazy"}
+        {...(priority ? { fetchpriority: "high" } : {})}
         className={`
           transition-opacity duration-500
           ${isLoading ? 'opacity-0' : 'opacity-100'}

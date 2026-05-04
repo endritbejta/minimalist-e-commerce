@@ -83,6 +83,7 @@ function CollectionGrid({ products, collection }) {
             key={product.id} 
             product={product} 
             delay={index / 2} 
+            priority={index < 4}
           />
         ))}
       </div>
