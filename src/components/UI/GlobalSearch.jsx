@@ -4,6 +4,10 @@ import { products } from '../../data/products';
 import { Link } from 'react-router-dom';
 import SmartImage from './SmartImage';
 
+/**
+ * GlobalSearch Component
+ * Provides a full-screen search overlay with real-time product filtering.
+ */
 const GlobalSearch = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');

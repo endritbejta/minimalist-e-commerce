@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import Button from '../UI/Button';
 
+/**
+ * PromoGrid Component
+ * Renders a grid of promotional banners with links to specific collections.
+ */
 function PromoGrid() {
   return (
     <section className="bg-gray-50 py-20 px-6">

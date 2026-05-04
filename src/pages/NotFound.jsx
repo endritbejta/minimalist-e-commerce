@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 
+/**
+ * NotFound Component
+ * The 404 error page displayed when a route doesn't match any existing pages.
+ */
 function NotFound() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">

@@ -3,6 +3,10 @@ import { products } from '../../data/products';
 import ProductCard from '../Product/ProductCard';
 import Button from '../UI/Button';
 
+/**
+ * FeaturedTabs Component
+ * Displays a tabbed interface for switching between different product sets (e.g., Favourites vs Best Sellers).
+ */
 function FeaturedTabs() {
   const [activeTab, setActiveTab] = useState('favourite');
 

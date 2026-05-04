@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 
 /**
  * AnimatedPrice Component
- * Smoothly animates a numeric value from its previous state to a new one.
+ * Smoothly animates a numeric value from its previous state to a new one using requestAnimationFrame.
  * 
- * @param {Object} props
+ * @param {Object} props - Component props.
  * @param {number} props.value - The target numeric value to animate to.
  * @param {number} [props.duration=600] - Duration of the animation in milliseconds.
  */

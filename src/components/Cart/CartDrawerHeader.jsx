@@ -1,11 +1,10 @@
 import { BsX } from "react-icons/bs";
 
 /**
- * Header for the cart drawer.
- *
- * @param {Object} props
- * @param {() => void} props.onClose - Closes the cart drawer.
- * @returns {import('react').JSX.Element}
+ * CartDrawerHeader Component
+ * The top bar of the cart drawer, containing the title and close action.
+ * @param {Object} props - Component props.
+ * @param {Function} props.onClose - Function to close the cart drawer.
  */
 function CartDrawerHeader({ onClose }) {
     return (

@@ -10,24 +10,14 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * Observes a single DOM element and reports when it enters or leaves the viewport.
- *
- * @param {Object} [options]
- * @param {Element | Document | null} [options.root=null] - Scroll container used as the viewport.
- * @param {string} [options.rootMargin='0px'] - Margin around the root, e.g. '0px 0px -20% 0px'.
- * @param {number | number[]} [options.threshold=0.1] - Percentage(s) of the target that must be visible.
- * @param {boolean} [options.triggerOnce=true] - Stop observing after the first visible intersection.
- * @param {boolean} [options.initialIsIntersecting=false] - Initial state before the observer runs.
- * @param {boolean} [options.unsupportedFallback=true] - State to use when IntersectionObserver is unavailable.
- * @returns {[import('react').CallbackRef<Element>, boolean]} Ref callback for the target element and its visibility state.
- *
- * @example
- * const [sectionRef, isVisible] = useIntersectionObserver({
- *   threshold: 0.25,
- *   rootMargin: '0px 0px -10% 0px',
- * });
- *
- * return <section ref={sectionRef} className={isVisible ? 'animate-fadeIn' : 'opacity-0'} />;
+ * useIntersectionObserver Hook
+ * Observes a DOM element and reports its visibility within the viewport.
+ * @param {Object} [options] - Observer configuration.
+ * @param {Element|null} [options.root=null] - Viewport element.
+ * @param {string} [options.rootMargin='0px'] - Margin around the root.
+ * @param {number|number[]} [options.threshold=0.1] - Visibility threshold(s).
+ * @param {boolean} [options.triggerOnce=true] - Whether to stop observing after first visibility.
+ * @returns {[Function, boolean]} A ref setter and the intersection state.
  */
 export const useIntersectionObserver = (options = {}) => {
   const {

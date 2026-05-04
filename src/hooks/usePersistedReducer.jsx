@@ -24,24 +24,13 @@ const getErrorMessage = (error) => {
 };
 
 /**
- * Creates a reducer whose state is hydrated from localStorage and saved after updates.
- *
- * Keep `storageKey` stable for the lifetime of the component. If the stored value is
- * an object, it is shallow-merged with `initialState` by default so newly added state
- * fields still receive their defaults.
- *
- * @param {import('react').Reducer<any, any>} reducer - Reducer used to update state.
- * @param {any} initialState - Default state used when storage is empty or unreadable.
- * @param {string} storageKey - localStorage key used for persistence.
- * @param {Object} [options]
- * @param {boolean} [options.mergeStoredState=true] - Merge stored objects with `initialState`.
- * @param {(state: any) => string} [options.serialize=JSON.stringify] - Converts state before saving.
- * @param {(value: string) => any} [options.deserialize=JSON.parse] - Converts saved text back to state.
- * @param {(error: unknown) => void} [options.onError=console.warn] - Handles storage/serialization errors.
- * @returns {[any, import('react').Dispatch<any>]} Current state and dispatch function.
- *
- * @example
- * const [state, dispatch] = usePersistedReducer(cartReducer, initialState, 'shopping-cart-v1');
+ * usePersistedReducer Hook
+ * A replacement for useReducer that persists state to localStorage.
+ * @param {Function} reducer - State transition logic.
+ * @param {any} initialState - The starting state.
+ * @param {string} storageKey - localStorage key.
+ * @param {Object} [options] - Configuration options.
+ * @returns {[any, Function]} Current state and dispatch function.
  */
 function usePersistedReducer(reducer, initialState, storageKey, options = {}) {
   const {

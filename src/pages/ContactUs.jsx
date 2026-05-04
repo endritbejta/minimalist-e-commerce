@@ -1,6 +1,10 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 import SEO from '../components/UI/SEO';
 
+/**
+ * ContactUs Component
+ * Provides a contact form and company contact information.
+ */
 function ContactUs() {
   return (
     <div className="container mx-auto px-6 py-12 max-w-3xl">

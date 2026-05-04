@@ -1,10 +1,12 @@
 import React from 'react';
 
 /**
- * A reusable component for rendering product variant swatches.
- * @param {Array} variants - The list of variants to display.
- * @param {Object} selectedVariant - The currently selected variant.
- * @param {Function} onSelect - Callback when a variant is selected.
+ * VariantSwatches Component
+ * Renders product variant selectors (colors or labels).
+ * @param {Object} props - Component props.
+ * @param {Object[]} props.variants - List of variants to display.
+ * @param {Object} props.selectedVariant - The currently active variant.
+ * @param {Function} props.onSelect - Callback triggered when a variant is clicked.
  */
 function VariantSwatches({ variants, selectedVariant, onSelect }) {
   if (!variants || variants.length === 0) return null;

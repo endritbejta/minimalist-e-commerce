@@ -1,5 +1,9 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 
+/**
+ * ReturnsPolicy Component
+ * Provides information on the 30-day return policy and exchange process.
+ */
 function ReturnsPolicy() {
   return (
     <div className="container mx-auto px-6 py-12 max-w-3xl">

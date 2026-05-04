@@ -3,6 +3,16 @@ import { BsTrash } from "react-icons/bs";
 import { useCart } from "../../context/useCart.jsx";
 import QuantitySelector from "../UI/QuantitySelector";
 
+/**
+ * CartItem Component
+ * Renders a single product row in the cart with quantity controls and remove animation.
+ * @param {Object} props - Component props.
+ * @param {Object} props.item - The cart item data.
+ * @param {boolean} [props.isRemoving=false] - Whether the item is currently being removed.
+ * @param {string} [props.removeDirection='right'] - Direction of the slide-out animation ('left' or 'right').
+ * @param {Function} props.onRemoveRequest - Callback to initiate removal.
+ * @param {Function} props.onRemoveAnimationEnd - Callback after removal animation finishes.
+ */
 function CartItem({
     item,
     isRemoving = false,

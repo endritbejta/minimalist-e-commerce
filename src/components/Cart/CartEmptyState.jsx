@@ -1,11 +1,10 @@
 import { BsCartCheck } from "react-icons/bs";
 
 /**
- * Empty cart message shown when there are no cart items.
- *
- * @param {Object} props
- * @param {() => void} props.onClose - Closes the cart drawer and returns the shopper to the page.
- * @returns {import('react').JSX.Element}
+ * CartEmptyState Component
+ * Displayed within the cart drawer when there are no items.
+ * @param {Object} props - Component props.
+ * @param {Function} props.onClose - Function to close the drawer.
  */
 function CartEmptyState({ onClose }) {
     return (

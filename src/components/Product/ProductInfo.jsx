@@ -1,3 +1,10 @@
+/**
+ * ProductInfo Component
+ * Renders the title and collection name for a product card.
+ * @param {Object} props - Component props.
+ * @param {string} props.title - The product title.
+ * @param {string} props.collection - The collection name the product belongs to.
+ */
 function ProductInfo({ title, collection }) {
   return (
     <div className="product-card-info w-full min-w-0">

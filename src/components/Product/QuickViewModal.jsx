@@ -5,6 +5,14 @@ import ProductPageMedia from './ProductPageMedia';
 import ProductPageInformation from './ProductPageInformation';
 import { CustomizationProvider } from '../../context/CustomizationContext';
 
+/**
+ * QuickViewModal Component
+ * A full-featured modal for viewing and interacting with a product without navigating.
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the modal is visible.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Object} props.product - The product object to display.
+ */
 function QuickViewModal({ isOpen, onClose, product }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
 

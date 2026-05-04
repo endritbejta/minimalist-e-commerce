@@ -1,11 +1,10 @@
 import AnimatedPrice from "../UI/AnimatedPrice";
 
 /**
- * Footer for checkout actions and the current cart subtotal.
- *
- * @param {Object} props
- * @param {number} props.cartTotal - Current subtotal before shipping and tax.
- * @returns {import('react').JSX.Element}
+ * CartDrawerFooter Component
+ * Displays the cart subtotal and the primary checkout action.
+ * @param {Object} props - Component props.
+ * @param {number} props.cartTotal - The total value of items in the cart.
  */
 function CartDrawerFooter({ cartTotal }) {
     return (

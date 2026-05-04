@@ -1,3 +1,7 @@
+/**
+ * PrivacyPolicy Component
+ * Displays the site's privacy policy and data collection practices.
+ */
 function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">

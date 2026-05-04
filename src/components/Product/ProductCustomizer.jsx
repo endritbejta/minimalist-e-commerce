@@ -27,6 +27,15 @@ const BACK_ALIGNMENTS = [
   { id: 'bottom', label: 'Bottom', top: '60%' },
 ];
 
+/**
+ * ProductCustomizer Component
+ * An interactive interface for applying custom emblems and placements to products.
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the customizer is visible.
+ * @param {Function} props.onClose - Function to close the customizer.
+ * @param {Function} props.onApply - Callback when customization is finished.
+ * @param {Object} props.currentCustomization - The existing customization state to edit.
+ */
 function ProductCustomizer({ isOpen, onClose, onApply, currentCustomization }) {
   const [selectedEmblem, setSelectedEmblem] = useState(currentCustomization?.emblem || EMBLEMS[0]);
   const [selectedPosition, setSelectedPosition] = useState(currentCustomization?.position || POSITIONS[1].id);

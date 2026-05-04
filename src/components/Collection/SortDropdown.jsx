@@ -7,6 +7,13 @@ import {
   BsFunnel
 } from 'react-icons/bs';
 
+/**
+ * SortDropdown Component
+ * A custom dropdown menu for selecting product sorting options.
+ * @param {Object} props - Component props.
+ * @param {string} props.sortBy - The currently selected sort option ID.
+ * @param {Function} props.setSortBy - Callback to update the sort option.
+ */
 const SortDropdown = ({ sortBy, setSortBy }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

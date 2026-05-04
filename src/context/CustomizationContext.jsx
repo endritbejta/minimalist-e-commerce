@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState } from 'react';
 
 const CustomizationContext = createContext();
 
+/**
+ * CustomizationProvider Component
+ * Manages the state of product customizations (emblems, positions, etc.) during selection.
+ * @param {Object} props - Component props.
+ * @param {ReactNode} props.children - Subtree with access to customization state.
+ */
 export const CustomizationProvider = ({ children }) => {
   const [customization, setCustomization] = useState(null);
 

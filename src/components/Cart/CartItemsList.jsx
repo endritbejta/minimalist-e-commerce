@@ -2,12 +2,11 @@ import { useCallback, useState } from "react";
 import CartItem from "./CartItem";
 
 /**
- * Renders cart items and delays state removal until each item's exit animation finishes.
- *
- * @param {Object} props
- * @param {Array<Object>} props.items - Items currently in the cart.
- * @param {(id: string | number) => void} props.onRemoveItem - Removes an item from cart state.
- * @returns {import('react').JSX.Element}
+ * CartItemsList Component
+ * Orchestrates the list of cart items and manages removal animations to prevent layout jumps.
+ * @param {Object} props - Component props.
+ * @param {Object[]} props.items - Array of items in the cart.
+ * @param {Function} props.onRemoveItem - Function to remove an item from state after animation.
  */
 function CartItemsList({ items, onRemoveItem }) {
     const [removingItemIds, setRemovingItemIds] = useState(() => new Set());

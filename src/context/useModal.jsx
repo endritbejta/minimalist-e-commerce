@@ -2,10 +2,9 @@ import { useContext } from 'react';
 import ModalContext from './modalContextValue.jsx';
 
 /**
- * Reads the global modal controller.
- *
- * @returns {Object} Current modal state plus `openModal(view, props)` and `closeModal()` helpers.
- * @throws {Error} When called outside of ModalProvider.
+ * useModal Hook
+ * Provides access to the global modal controller.
+ * @returns {Object} Modal state and trigger functions (openModal, closeModal).
  */
 export const useModal = () => {
   const context = useContext(ModalContext);

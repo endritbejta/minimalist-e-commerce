@@ -1,3 +1,7 @@
+/**
+ * TermsOfService Component
+ * Displays the legal terms and conditions for using the website.
+ */
 function TermsOfService() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">

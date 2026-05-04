@@ -1,6 +1,10 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 import SEO from '../components/UI/SEO';
 
+/**
+ * FAQ Component
+ * Renders a list of frequently asked questions and their answers.
+ */
 function FAQ() {
   const faqs = [
     {
