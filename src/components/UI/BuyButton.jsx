@@ -1,12 +1,14 @@
+import { useCart } from "../../context/useCart";
+
 /**
  * BuyButton Component
  * A specialized button for adding products to the cart.
- * @param {Object} product - The product object to add to cart.
- * @param {number} quantity - Number of items to add, defaults to 1.
- * @param {string} className - Additional CSS classes.
- * @param {React.ReactNode} children - Button text or elements.
- * @param {string} variant - Visual style: 'primary', 'secondary', 'outline', or 'ghost'.
- * @param {Object} props - Additional props spread onto the button element.
+ * @param {Object} props - Component props.
+ * @param {Object} props.product - The product object to add to cart.
+ * @param {number} [props.quantity=1] - Number of items to add.
+ * @param {string} [props.className=""] - Additional CSS classes.
+ * @param {ReactNode} props.children - Button content.
+ * @param {string} [props.variant="primary"] - Visual style variant.
  */
 function BuyButton({ product, quantity = 1, className = "", children, variant = "primary", ...props }) {
   const { addToCart } = useCart();

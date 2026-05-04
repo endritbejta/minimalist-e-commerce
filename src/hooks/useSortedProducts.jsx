@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 
 /**
- * Custom hook to sort an array of products based on a sort criteria.
- * @param {Array} products - The array of product objects.
- * @param {string} sortBy - The sorting criteria ('price-low', 'price-high', 'az', 'za', or 'featured').
- * @returns {Array} - The sorted array of products.
+ * useSortedProducts Hook
+ * Returns a sorted version of the provided products array based on the given criteria.
+ * @param {Object[]} products - Array of product objects.
+ * @param {string} sortBy - Sort criteria ('price-low', 'price-high', 'az', 'za', 'featured').
+ * @returns {Object[]} The sorted products.
  */
 export const useSortedProducts = (products, sortBy) => {
   return useMemo(() => {

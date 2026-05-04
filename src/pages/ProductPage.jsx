@@ -7,6 +7,11 @@ import ProductPageInformation from '../components/Product/ProductPageInformation
 import { CustomizationProvider } from '../context/CustomizationContext';
 import SEO from '../components/UI/SEO';
 
+/**
+ * ProductPage Component
+ * The main container for individual product details.
+ * Handles product lookup by handle and sets up the customization context.
+ */
 function ProductPage() {
   const { productHandle } = useParams();
   

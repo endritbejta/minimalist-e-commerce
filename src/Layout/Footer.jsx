@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import { BsInstagram, BsTwitter, BsFacebook } from 'react-icons/bs';
 
+/**
+ * Footer Component
+ * Site footer containing branding, navigation links, policy links, and newsletter signup.
+ */
 function Footer() {
   const currentYear = new Date().getFullYear();
 

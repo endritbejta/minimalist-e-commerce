@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import SmartImage from "../UI/SmartImage";
 import { useCustomization } from "../../context/CustomizationContext";
 
+/**
+ * ProductPageMedia Component
+ * Handles the main image display and thumbnail gallery on the product page.
+ * Includes support for customization overlays (emblems).
+ * @param {Object} props - Component props.
+ * @param {string[]} [props.images=[]] - Array of image URLs for the product.
+ * @param {string} props.title - The product title for alt tags.
+ */
 function ProductPageMedia({ images = [], title }) {
   const { customization } = useCustomization();
   const [activeIndex, setActiveIndex] = useState(0);

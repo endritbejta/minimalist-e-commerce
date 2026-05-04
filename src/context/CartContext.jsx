@@ -104,11 +104,10 @@ const cartReducer = (state, action) => {
 };
 
 /**
- * Provides persisted cart state and cart action helpers to the app.
- *
- * @param {Object} props
- * @param {import('react').ReactNode} props.children - Application subtree that can access the cart.
- * @returns {import('react').JSX.Element}
+ * CartProvider Component
+ * Manages persisted cart state, including item quantities and subtotal calculations.
+ * @param {Object} props - Component props.
+ * @param {ReactNode} props.children - Subtree with access to cart state.
  */
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = usePersistedReducer(cartReducer, initialState, STORAGE_KEY);

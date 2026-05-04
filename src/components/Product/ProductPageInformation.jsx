@@ -9,6 +9,14 @@ import { useCustomization } from "../../context/CustomizationContext";
 import AnimatedPrice from "../UI/AnimatedPrice";
 import AnimatedHeading from "../UI/AnimatedHeading";
 
+/**
+ * ProductPageInformation Component
+ * Renders the detailed information section of a product page, including variants and actions.
+ * @param {Object} props - Component props.
+ * @param {Object} props.product - The full product object.
+ * @param {Object} props.selectedVariant - The currently selected product variant.
+ * @param {Function} props.setSelectedVariant - Function to update the selected variant.
+ */
 function ProductPageInformation({ product, selectedVariant, setSelectedVariant }) {
   const [quantity, setQuantity] = useState(1);
   const { openModal } = useModal();

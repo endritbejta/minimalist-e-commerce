@@ -1,5 +1,9 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 
+/**
+ * ShippingPolicy Component
+ * Outlines order processing times and shipping rates.
+ */
 function ShippingPolicy() {
   return (
     <div className="container mx-auto px-6 py-12 max-w-3xl">

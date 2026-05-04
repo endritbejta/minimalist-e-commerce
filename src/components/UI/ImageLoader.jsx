@@ -1,5 +1,8 @@
-import React from 'react';
-
+/**
+ * ImageLoader Component
+ * A skeleton-style loader used for individual images during their loading state.
+ * @param {string} className - Additional CSS classes for the loader wrapper.
+ */
 const ImageLoader = ({ className = "" }) => {
   return (
     <div className={`w-full h-full flex flex-col items-center justify-center bg-gray-50/50 ${className}`}>

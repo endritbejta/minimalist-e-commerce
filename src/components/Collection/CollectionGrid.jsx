@@ -6,6 +6,13 @@ import SortDropdown from './SortDropdown';
 import { useSortedProducts } from '../../hooks/useSortedProducts';
 import AnimatedHeading from '../UI/AnimatedHeading';
 
+/**
+ * CollectionGrid Component
+ * Displays a sortable and toggleable grid of products within a collection.
+ * @param {Object} props - Component props.
+ * @param {Object[]} props.products - The list of products to display.
+ * @param {string} props.collection - The handle of the current collection.
+ */
 function CollectionGrid({ products, collection }) {
   const [viewCols, setViewCols] = useState(2);
   const [sortBy, setSortBy] = useState('featured');

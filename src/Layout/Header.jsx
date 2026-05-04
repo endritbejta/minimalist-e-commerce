@@ -5,6 +5,10 @@ import { useCart } from "../context/useCart.jsx";
 import MobileMenu from "./MobileMenu";
 import GlobalSearch from "../components/UI/GlobalSearch";
 
+/**
+ * Header Component
+ * The primary navigation bar, featuring the logo, desktop menu, search trigger, and cart toggle.
+ */
 function Header() {
     const { toggleCart, cartCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);

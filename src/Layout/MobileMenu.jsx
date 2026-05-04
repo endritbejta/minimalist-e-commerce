@@ -2,6 +2,13 @@ import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { BsX, BsInstagram, BsTwitter, BsFacebook } from "react-icons/bs";
 
+/**
+ * MobileMenu Component
+ * A full-screen overlay menu for mobile navigation.
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Whether the menu is visible.
+ * @param {Function} props.onClose - Function to close the menu.
+ */
 function MobileMenu({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {

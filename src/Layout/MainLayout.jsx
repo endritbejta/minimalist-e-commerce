@@ -3,6 +3,10 @@ import Header from "./Header";
 import CartDrawer from "./CartDrawer";
 import Footer from "./Footer";
 
+/**
+ * MainLayout Component
+ * Provides the core layout structure for the application, including shared header, footer, and cart.
+ */
 function MainLayout() {
   return (
     <div className="min-h-screen flex flex-col">

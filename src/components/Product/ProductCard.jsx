@@ -8,9 +8,16 @@ import BuyButton from '../UI/BuyButton';
 import { useModal } from '../../context/useModal.jsx';
 import QuickViewModal from './QuickViewModal';
 
-// DEMO: React.memo
-// This prevents the card from re-rendering if the 'product' and 'delay' props are the same.
-// Extremely useful in long lists where parent state changes (like search typing).
+/**
+ * ProductCard Component
+ * Displays a summary of a product with an image, title, price, and quick actions.
+ * Optimized with React.memo for high performance in long lists.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Object} props.product - The product object to display.
+ * @param {number} [props.delay=0] - Animation delay offset for staggered entrance.
+ * @param {boolean} [props.priority=false] - Whether the image should have high fetch priority.
+ */
 const ProductCard = memo(({ product, delay = 0, priority = false }) => {
   const { openModal } = useModal();
 

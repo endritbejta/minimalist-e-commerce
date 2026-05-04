@@ -23,14 +23,10 @@ const INITIAL_MODAL_STATE = {
  */
 
 /**
- * Provides a global modal controller for opening component-based modal views.
- *
- * Modal views receive `isOpen`, `onClose`, and any props passed to `openModal`.
- * Closed modals remain mounted for `MODAL_EXIT_DURATION` so their exit animation can finish.
- *
- * @param {Object} props
- * @param {import('react').ReactNode} props.children - Application subtree that can open modals.
- * @returns {import('react').JSX.Element}
+ * ModalProvider Component
+ * Orchestrates a global modal system, allowing any component to trigger overlays.
+ * @param {Object} props - Component props.
+ * @param {ReactNode} props.children - Subtree with access to modal state.
  */
 export const ModalProvider = ({ children }) => {
   const [modal, setModal] = useState(INITIAL_MODAL_STATE);

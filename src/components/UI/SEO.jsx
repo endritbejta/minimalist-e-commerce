@@ -1,14 +1,15 @@
 import { Helmet } from 'react-helmet-async';
 
 /**
- * SEO Component for dynamic meta tags
- * @param {Object} props
- * @param {string} props.title - Page title
- * @param {string} props.description - Meta description
- * @param {string} [props.keywords] - Meta keywords
- * @param {string} [props.image] - Open Graph image
- * @param {string} [props.url] - Canonical URL
- * @param {string} [props.type] - Page type (website, product, etc.)
+ * SEO Component
+ * Dynamically injects meta tags into the document head for search engine optimization and social sharing.
+ * @param {Object} props - Component props.
+ * @param {string} props.title - The title of the page.
+ * @param {string} props.description - A short summary of the page content.
+ * @param {string} [props.keywords] - Comma-separated SEO keywords.
+ * @param {string} [props.image] - URL for the Open Graph image.
+ * @param {string} [props.url] - Canonical URL for the page.
+ * @param {string} [props.type='website'] - Open Graph content type.
  */
 const SEO = ({ 
   title, 

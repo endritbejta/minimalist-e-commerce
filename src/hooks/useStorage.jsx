@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 
 /**
- * A custom hook that manages state and syncs it with localStorage.
- * @param {string} key - The key to use in localStorage.
- * @param {any} initialValue - The default initial value if none is found in storage.
+ * useStorage Hook
+ * Manages state and automatically syncs it with localStorage.
+ * @param {string} key - localStorage key.
+ * @param {any} initialValue - Default value if nothing is stored.
+ * @returns {[any, Function]} The stored value and a setter function.
  */
 function useStorage(key, initialValue) {
   // Initialize state from localStorage or use the provided initialValue

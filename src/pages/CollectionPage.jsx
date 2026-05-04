@@ -4,6 +4,10 @@ import CollectionGrid from '../components/Collection/CollectionGrid';
 
 import SEO from '../components/UI/SEO';
 
+/**
+ * CollectionPage Component
+ * Displays a list of products belonging to a specific collection.
+ */
 function CollectionPage() {
   const { handle } = useParams();
 

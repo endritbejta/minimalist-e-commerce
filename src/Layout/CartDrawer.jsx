@@ -6,6 +6,10 @@ import CartDrawerHeader from "../components/Cart/CartDrawerHeader";
 import CartEmptyState from "../components/Cart/CartEmptyState";
 import CartItemsList from "../components/Cart/CartItemsList";
 
+/**
+ * CartDrawer Component
+ * A slide-out panel that manages the visibility and content of the shopping cart.
+ */
 function CartDrawer() {
     const { isOpen, closeCart, items, cartTotal, removeFromCart } = useCart();
 

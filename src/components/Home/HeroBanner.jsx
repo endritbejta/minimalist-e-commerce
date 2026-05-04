@@ -48,6 +48,11 @@ const RENDERED_SLIDES = [
   { ...SLIDES[0], originalIndex: 0, renderId: 'clone-first' },
 ];
 
+/**
+ * HeroBanner Component
+ * A full-width, auto-playing slider for high-impact promotions.
+ * Supports touch gestures (swiping) and staggered animations for text elements.
+ */
 function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const [trackIndex, setTrackIndex] = useState(1);
@@ -247,7 +252,7 @@ function HeroBanner() {
                 className="h-full w-full object-cover"
                 draggable="false"
                 loading={slide.id === 1 ? "eager" : "lazy"}
-                {...(slide.id === 1 ? { fetchpriority: "high" } : {})}
+                {...(slide.id === 1 ? { fetchPriority: "high" } : {})}
               />
             </picture>
 

@@ -7,6 +7,10 @@ import PromoGrid from "./components/Home/PromoGrid";
 
 import SEO from "./components/UI/SEO";
 
+/**
+ * App Component
+ * The entry point for the home page, composing the main marketing sections.
+ */
 function App() {
   return (
     <div className="home-page">
