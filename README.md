@@ -1,18 +1,57 @@
-# React + Vite
+# Minimalist Essentials - Premium E-Commerce Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sophisticated, high-performance minimalist e-commerce application built with **React 19** and **Vite**. This project prioritizes visual excellence, smooth interactions, and a premium user experience.
 
-Currently, two official plugins are available:
+🔗 **[Live Demo](https://endrits-e-commerce.netlify.app/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Key Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Premium Aesthetics**: A stunning UI designed with a minimalist philosophy, featuring vibrant color palettes, sleek typography, and glassmorphism.
+- **Dynamic Product Customization**: Innovative product customizer allowing users to modify items (like adding emblems to T-shirts) with real-time visual feedback.
+- **Advanced SEO System**: Integrated `react-helmet-async` for dynamic meta tags, unique titles for every page, and full Open Graph/Twitter Card support for social sharing.
+- **High Performance**: Optimized using Vite and React 19 features like the React Compiler for lightning-fast interactions and page loads.
+- **Responsive & Modern**: Fully responsive layout built with Tailwind CSS, ensuring a premium experience on desktop, tablet, and mobile.
+- **Intuitive UX**: Includes features like a slide-out cart drawer, smooth scroll-to-top, and animated breadcrumbs for easy navigation.
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Routing**: [React Router 7](https://reactrouter.com/)
+- **SEO**: [React Helmet Async](https://github.com/staylor/react-helmet-async)
+- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/endritbejta/minimalist-e-commerce.git
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 📄 License
+
+This project is open-source and available for everyone. Curated with care by **Endrit Bejta**.
