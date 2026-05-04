@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-loading-bar {
+    animation: loadingBar 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  .animate-sweep-left {
+    animation: sweepLeft 0.6s linear infinite;
+  }
+}
+
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes sweepLeft {
+  0% {
+    transform: translateX(50%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes cartItemCollapseOut {
+  from {
+    max-height: var(--cart-item-height, 160px);
+    border-color: rgb(243 244 246);
+  }
+  to {
+    max-height: 0;
+    border-color: transparent;
+  }
+}
+
+@keyframes cartItemContentSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--cart-item-remove-x, 110%)) scale(0.98);
+  }
+}
+
+.cart-item-row {
+  max-height: var(--cart-item-height, 160px);
+  overflow: hidden;
+}
+
+.cart-item-content {
+  will-change: transform, opacity;
+}
+
+.cart-item-removing {
+  pointer-events: none;
+  transform-origin: center;
+  animation: cartItemCollapseOut 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.cart-item-removing .cart-item-content {
+  animation: cartItemContentSlideOut 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.cart-item-removing-left {
+  --cart-item-remove-x: -110%;
+}
+
+.cart-item-removing-right {
+  --cart-item-remove-x: 110%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-item-removing,
+  .cart-item-removing .cart-item-content {
+    animation-duration: 1ms;
+  }
+}
+
+.shadow-swatch {
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.is-animating-price {
+  position: relative;
+}
+
+.is-animating-price::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 25%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.45) 75%,
+    transparent 100%
+  );
+  animation: sweepLeft 0.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-revealUp {
+  display: inline-block;
+  opacity: 0;
+  animation: revealUp 0.8s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+}
+
+@keyframes bounceUp {
+  0% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20%);
+  }
+  70% {
+    transform: translateY(10%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-bounceUp {
+  display: inline-block;
+  opacity: 0;
+  animation: bounceUp 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes revealDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-revealDown {
+  display: inline-block;
+  opacity: 0;
+  animation: revealDown 0.8s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+}
