@@ -1,3 +1,6 @@
+import { useRef, useState } from "react";
+import ImageLoader from "./ImageLoader";
+
 /**
  * SmartImage Component
  * An intelligent image component that handles loading states and LCP prioritization.
@@ -17,7 +20,7 @@ const SmartImage = ({
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const prevSrc = React.useRef(src);
+  const prevSrc = useRef(src);
 
   // If the src changes, reset loading state immediately during render
   // to avoid useEffect race conditions with cached images
@@ -39,7 +42,7 @@ const SmartImage = ({
         alt={alt}
         onLoad={() => setIsLoading(false)}
         loading={priority ? "eager" : "lazy"}
-        {...(priority ? { fetchpriority: "high" } : {})}
+        {...(priority ? { fetchPriority: "high" } : {})}
         className={`
           transition-opacity duration-500
           ${isLoading ? 'opacity-0' : 'opacity-100'}

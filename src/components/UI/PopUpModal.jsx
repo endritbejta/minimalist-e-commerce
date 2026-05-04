@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 /**
  * PopUpModal Component
  * A reusable modal with focus trapping, ESC key support, and entry/exit animations.

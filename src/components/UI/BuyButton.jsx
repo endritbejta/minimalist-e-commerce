@@ -1,3 +1,5 @@
+import { useCart } from "../../context/useCart";
+
 /**
  * BuyButton Component
  * A specialized button for adding products to the cart.

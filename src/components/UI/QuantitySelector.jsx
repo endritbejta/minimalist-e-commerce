@@ -1,3 +1,5 @@
+import { BsDash, BsPlus } from "react-icons/bs";
+
 /**
  * QuantitySelector Component
  * A numeric input control for adjusting product quantities.
