@@ -1,7 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-
-const PopUpModal = ({ isOpen, onClose, children, className = "p-6 min-w-[300px] max-w-[90%]" }) => {
+/**
+ * PopUpModal Component
+ * A reusable modal with focus trapping, ESC key support, and entry/exit animations.
+ * @param {boolean} isOpen - Whether the modal is currently visible.
+ * @param {Function} onClose - Callback function to close the modal.
+ * @param {React.ReactNode} children - The content to display inside the modal.
+ * @param {string} className - Additional CSS classes for the inner modal container.
+ * @param {Object} props - Additional props spread onto the inner modal div.
+ */
+const PopUpModal = ({ isOpen, onClose, children, className = "p-6 min-w-[300px] max-w-[90%]", ...props }) => {
   const modalRef = useRef(null);
   const [isVisible, setIsVisible] = useState(isOpen);
 
@@ -75,6 +81,7 @@ const PopUpModal = ({ isOpen, onClose, children, className = "p-6 min-w-[300px] 
       onClick={onClose}
     >
       <div
+        {...props}
         ref={modalRef}
         role="dialog"
         aria-modal="true"

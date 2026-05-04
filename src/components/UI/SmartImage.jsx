@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
-import ImageLoader from './ImageLoader';
-
+/**
+ * SmartImage Component
+ * An intelligent image component that handles loading states and LCP prioritization.
+ * @param {string} src - The image source URL.
+ * @param {string} alt - Alternative text for accessibility.
+ * @param {string} className - CSS classes for the outer wrapper div.
+ * @param {string} imgClassName - CSS classes for the img element itself.
+ * @param {boolean} priority - If true, sets loading="eager" and high fetch priority for LCP.
+ * @param {Object} props - Additional props spread onto the wrapper div.
+ */
 const SmartImage = ({ 
   src, 
   alt, 
   className = "", 
   imgClassName = "",
-  priority = false
+  priority = false,
+  ...props
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const prevSrc = React.useRef(src);
@@ -19,7 +27,7 @@ const SmartImage = ({
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative overflow-hidden ${className}`} {...props}>
       {isLoading && (
         <div className="absolute inset-0 z-10">
           <ImageLoader />
