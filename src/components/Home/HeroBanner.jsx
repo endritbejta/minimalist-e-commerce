@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import AnimatedHeading from '../UI/AnimatedHeading';
 import Button from '../UI/Button';
 
-const AUTOPLAY_DELAY = 5000;
 const SWIPE_THRESHOLD = 50;
 
 const SLIDES = [
@@ -42,52 +41,40 @@ const SLIDES = [
   }
 ];
 
-const RENDERED_SLIDES = [
-  { ...SLIDES[SLIDES.length - 1], originalIndex: SLIDES.length - 1, renderId: 'clone-last' },
-  ...SLIDES.map((slide, index) => ({ ...slide, originalIndex: index, renderId: slide.id })),
-  { ...SLIDES[0], originalIndex: 0, renderId: 'clone-first' },
-];
-
-/**
- * HeroBanner Component
- * A full-width, auto-playing slider for high-impact promotions.
- * Supports touch gestures (swiping) and staggered animations for text elements.
- */
 function HeroBanner() {
   const [current, setCurrent] = useState(0);
-  const [trackIndex, setTrackIndex] = useState(1);
+  const [trackIndex, setTrackIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [isJumping, setIsJumping] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+
   const dragStartXRef = useRef(0);
   const isDraggingRef = useRef(false);
   const hasDraggedRef = useRef(false);
   const hasCapturedRef = useRef(false);
 
   const goToSlide = useCallback((index) => {
-    setCurrent((index + SLIDES.length) % SLIDES.length);
-    setTrackIndex(index + 1);
+    const safeIndex = Math.max(0, Math.min(index, SLIDES.length - 1));
+    setCurrent(safeIndex);
+    setTrackIndex(safeIndex);
   }, []);
 
   const goToNextSlide = useCallback(() => {
-    setCurrent((previousSlide) => (previousSlide + 1) % SLIDES.length);
-    setTrackIndex((previousIndex) => previousIndex + 1);
+    setCurrent((prev) => {
+      const next = Math.min(prev + 1, SLIDES.length - 1);
+      setTrackIndex(next);
+      return next;
+    });
   }, []);
 
   const goToPreviousSlide = useCallback(() => {
-    setCurrent((previousSlide) => (previousSlide - 1 + SLIDES.length) % SLIDES.length);
-    setTrackIndex((previousIndex) => previousIndex - 1);
+    setCurrent((prev) => {
+      const next = Math.max(prev - 1, 0);
+      setTrackIndex(next);
+      return next;
+    });
   }, []);
 
-  useEffect(() => {
-    if (isPaused || isDraggingRef.current) {
-      return undefined;
-    }
-
-    const autoplayTimer = window.setTimeout(goToNextSlide, AUTOPLAY_DELAY);
-    return () => window.clearTimeout(autoplayTimer);
-  }, [current, goToNextSlide, isPaused]);
 
   const handlePointerDown = (event) => {
     isDraggingRef.current = true;
@@ -100,13 +87,10 @@ function HeroBanner() {
   };
 
   const handlePointerMove = (event) => {
-    if (!isDraggingRef.current) {
-      return;
-    }
+    if (!isDraggingRef.current) return;
 
     const distance = event.clientX - dragStartXRef.current;
-    
-    // Only start dragging and capture pointer after crossing a threshold
+
     if (!hasDraggedRef.current && Math.abs(distance) > 6) {
       hasDraggedRef.current = true;
       if (!hasCapturedRef.current) {
@@ -121,28 +105,24 @@ function HeroBanner() {
   };
 
   const handlePointerUp = (event) => {
-    if (!isDraggingRef.current) {
-      return;
-    }
+    if (!isDraggingRef.current) return;
 
     if (hasCapturedRef.current) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+
     const distance = event.clientX - dragStartXRef.current;
-    const hasDragged = hasDraggedRef.current;
-    
+
     isDraggingRef.current = false;
     hasCapturedRef.current = false;
     setIsDragging(false);
     setDragOffset(0);
 
-    if (hasDragged && Math.abs(distance) >= SWIPE_THRESHOLD) {
-      if (distance < 0) {
-        goToNextSlide();
-      } else {
-        goToPreviousSlide();
-      }
+    if (hasDraggedRef.current && Math.abs(distance) >= SWIPE_THRESHOLD) {
+      distance < 0 ? goToNextSlide() : goToPreviousSlide();
     }
+
+    hasDraggedRef.current = false;
 
     if (event.pointerType !== 'mouse') {
       window.setTimeout(() => setIsPaused(false), 800);
@@ -162,16 +142,16 @@ function HeroBanner() {
 
   const trackStyle = {
     transform: `translateX(calc(-${trackIndex * 100}% + ${dragOffset}px))`,
-    transition: isDragging || isJumping ? 'none' : 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)',
+    transition: isDragging
+      ? 'none'
+      : 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)',
   };
 
   const sliderClassName = `flex h-full cursor-grab select-none ${
     isDragging ? 'cursor-grabbing' : ''
   }`;
 
-  const handleMouseEnter = () => {
-    setIsPaused(true);
-  };
+  const handleMouseEnter = () => setIsPaused(true);
 
   const handleMouseLeave = () => {
     if (!isDraggingRef.current) {
@@ -192,32 +172,6 @@ function HeroBanner() {
     }
   };
 
-  const handleTransitionEnd = (event) => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    if (trackIndex === 0) {
-      setIsJumping(true);
-      setTrackIndex(SLIDES.length);
-    } else if (trackIndex === SLIDES.length + 1) {
-      setIsJumping(true);
-      setTrackIndex(1);
-    }
-  };
-
-  useEffect(() => {
-    if (!isJumping) {
-      return undefined;
-    }
-
-    const frameId = window.requestAnimationFrame(() => {
-      setIsJumping(false);
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [isJumping]);
-
   useEffect(() => {
     return () => {
       isDraggingRef.current = false;
@@ -235,12 +189,11 @@ function HeroBanner() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
-        onTransitionEnd={handleTransitionEnd}
         onDragStart={(e) => e.preventDefault()}
       >
-        {RENDERED_SLIDES.map((slide) => (
+        {SLIDES.map((slide, index) => (
           <div
-            key={slide.renderId}
+            key={slide.id}
             className={`relative h-full w-full flex-none overflow-hidden ${slide.bg}`}
             style={{ touchAction: 'pan-y' }}
           >
@@ -262,7 +215,7 @@ function HeroBanner() {
               to={slide.link}
               className="absolute inset-0 z-10"
               aria-label={`${slide.cta}: ${slide.title}`}
-              tabIndex={slide.originalIndex === current ? 0 : -1}
+              tabIndex={index === current ? 0 : -1}
               onClick={handleSlideLinkClick}
               onDragStart={(e) => e.preventDefault()}
             />
@@ -276,7 +229,7 @@ function HeroBanner() {
                   <AnimatedHeading
                     as="h1"
                     className="text-4xl font-bold tracking-tight text-white py-2 sm:text-5xl md:text-7xl"
-                    isVisible={current === slide.originalIndex}
+                    isVisible={current === index}
                     triggerOnce={true}
                   >
                     {slide.title}
@@ -299,9 +252,6 @@ function HeroBanner() {
         ))}
       </div>
 
-
-
-      {/* Indicators */}
       <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 space-x-3 md:bottom-8">
         {SLIDES.map((_, idx) => (
           <button
