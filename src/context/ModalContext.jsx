@@ -1,5 +1,6 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import ModalContext from './modalContextValue.jsx';
+import { useCallback, useEffect, useMemo, useRef, useState, createContext, use } from 'react';
+
+const ModalContext = createContext(undefined);
 
 const MODAL_EXIT_DURATION = 200;
 
@@ -18,19 +19,21 @@ const INITIAL_MODAL_STATE = {
 
 /**
  * @typedef {ModalState & Object} ModalContextValue
- * @property {(view: import('react').ComponentType<any>, props?: Object) => void} openModal - Opens a modal component with optional props.
- * @property {() => void} closeModal - Starts the modal close animation and clears it afterward.
+ * @property {(view: import('react').ComponentType<any>, props?: Object) => Promise<any>} openModal - Opens a modal component with optional props and returns a Promise resolving to modal output.
+ * @property {(result?: any) => void} closeModal - Starts the modal close animation and resolves the active promise.
  */
 
 /**
  * ModalProvider Component
  * Orchestrates a global modal system, allowing any component to trigger overlays.
+ * Uses modern React 19 context value syntax and Promise-based dynamic resolution.
  * @param {Object} props - Component props.
  * @param {ReactNode} props.children - Subtree with access to modal state.
  */
 export const ModalProvider = ({ children }) => {
   const [modal, setModal] = useState(INITIAL_MODAL_STATE);
   const cleanupTimerRef = useRef(null);
+  const resolveRef = useRef(null);
 
   const clearCleanupTimer = useCallback(() => {
     if (!cleanupTimerRef.current) {
@@ -43,14 +46,23 @@ export const ModalProvider = ({ children }) => {
 
   const openModal = useCallback((view, props = {}) => {
     clearCleanupTimer();
-    setModal({
-      isOpen: true,
-      view,
-      props,
+
+    // Resolve any previously opened modal with null (closed without specific action)
+    if (resolveRef.current) {
+      resolveRef.current(null);
+    }
+
+    return new Promise((resolve) => {
+      resolveRef.current = resolve;
+      setModal({
+        isOpen: true,
+        view,
+        props,
+      });
     });
   }, [clearCleanupTimer]);
 
-  const closeModal = useCallback(() => {
+  const closeModal = useCallback((result = null) => {
     setModal((currentModal) => {
       if (!currentModal.view || !currentModal.isOpen) {
         return currentModal;
@@ -61,6 +73,11 @@ export const ModalProvider = ({ children }) => {
         isOpen: false,
       };
     });
+
+    if (resolveRef.current) {
+      resolveRef.current(result);
+      resolveRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
@@ -77,36 +94,28 @@ export const ModalProvider = ({ children }) => {
   }, [clearCleanupTimer, modal.isOpen, modal.view]);
 
   useEffect(() => {
-    return clearCleanupTimer;
+    return () => {
+      clearCleanupTimer();
+      if (resolveRef.current) {
+        resolveRef.current(null);
+        resolveRef.current = null;
+      }
+    };
   }, [clearCleanupTimer]);
 
+  // Handle body scroll locking with clean restoration
   useEffect(() => {
     if (!modal.isOpen) {
       return undefined;
     }
 
     const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.setProperty('overflow', 'hidden');
 
     return () => {
       document.body.style.overflow = originalOverflow;
     };
   }, [modal.isOpen]);
-
-  useEffect(() => {
-    if (!modal.isOpen) {
-      return undefined;
-    }
-
-    const handleEsc = (event) => {
-      if (event.key === 'Escape') {
-        closeModal();
-      }
-    };
-
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [closeModal, modal.isOpen]);
 
   const value = useMemo(() => ({
     ...modal,
@@ -115,25 +124,42 @@ export const ModalProvider = ({ children }) => {
   }), [modal, openModal, closeModal]);
 
   return (
-    <ModalContext.Provider value={value}>
+    <ModalContext value={value}>
       {children}
       <ModalContainer />
-    </ModalContext.Provider>
+    </ModalContext>
   );
 };
 
 function ModalContainer() {
-  const { isOpen, view: ModalView, props, closeModal } = useContext(ModalContext);
+  const { isOpen, view: ModalView, props, closeModal } = use(ModalContext);
 
   if (!ModalView) {
     return null;
   }
 
+  const viewKey = props?.product?.id || props?.id || 'modal-view';
+
   return (
     <ModalView
       {...props}
+      key={viewKey}
       isOpen={isOpen}
       onClose={closeModal}
     />
   );
 }
+
+/**
+ * useModal Hook
+ * Provides access to the global modal context.
+ */
+export const useModal = () => {
+  const context = use(ModalContext);
+
+  if (context === undefined) {
+    throw new Error('useModal must be used within ModalProvider');
+  }
+
+  return context;
+};

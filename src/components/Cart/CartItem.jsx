@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { BsTrash } from "react-icons/bs";
-import { useCart } from "../../context/useCart.jsx";
+import { useCart } from "../../context/CartContext.jsx";
 import QuantitySelector from "../UI/QuantitySelector";
 
 /**

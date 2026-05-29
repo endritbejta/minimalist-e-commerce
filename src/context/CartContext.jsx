@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, createContext, useContext } from 'react';
 import usePersistedReducer from '../hooks/usePersistedReducer';
-import CartContext from './cartContextValue.jsx';
+
+const CartContext = createContext(undefined);
 
 const STORAGE_KEY = 'shopping-cart-v1';
 const DEFAULT_QUANTITY = 1;
@@ -184,4 +185,19 @@ export const CartProvider = ({ children }) => {
       {children}
     </CartContext.Provider>
   );
+};
+
+/**
+ * useCart Hook
+ * Provides access to the global cart state and management functions.
+ * @returns {Object} Cart items, totals, and action helpers.
+ */
+export const useCart = () => {
+  const context = useContext(CartContext);
+
+  if (context === undefined) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+
+  return context;
 };
