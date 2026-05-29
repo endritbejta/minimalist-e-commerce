@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useCart } from "../context/useCart.jsx";
+import { useCart } from "../context/CartContext.jsx";
 import CartDrawerFooter from "../components/Cart/CartDrawerFooter";
 import CartDrawerHeader from "../components/Cart/CartDrawerHeader";
 import CartEmptyState from "../components/Cart/CartEmptyState";

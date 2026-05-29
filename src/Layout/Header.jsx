@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom"
 import { BsCartCheck, BsList } from "react-icons/bs";
-import { useCart } from "../context/useCart.jsx";
+import { useCart } from "../context/CartContext.jsx";
 import MobileMenu from "./MobileMenu";
 import GlobalSearch from "../components/UI/GlobalSearch";
 
@@ -25,7 +25,7 @@ function Header() {
             </button>
 
             <div className='logo-holder font-bold text-xl'>
-                <NavLink to="/">E-COMMERCE</NavLink>
+                <NavLink to="/">PREMIUM SHOP</NavLink>
             </div>
 
             {/* Desktop Navigation */}

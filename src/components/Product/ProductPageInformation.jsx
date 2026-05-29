@@ -4,7 +4,7 @@ import QuantitySelector from "../UI/QuantitySelector";
 import VariantSwatches from "./VariantSwatches";
 import ProductCustomizer from "./ProductCustomizer";
 import { IoColorWandOutline } from "react-icons/io5";
-import { useModal } from "../../context/useModal.jsx";
+import { useModal } from "../../context/ModalContext.jsx";
 import { useCustomization } from "../../context/CustomizationContext";
 import AnimatedPrice from "../UI/AnimatedPrice";
 import AnimatedHeading from "../UI/AnimatedHeading";

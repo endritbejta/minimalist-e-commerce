@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import PopUpModal from '../UI/PopUpModal';
 import ProductPageMedia from './ProductPageMedia';
@@ -8,26 +8,28 @@ import { CustomizationProvider } from '../../context/CustomizationContext';
 /**
  * QuickViewModal Component
  * A full-featured modal for viewing and interacting with a product without navigating.
+ * Utilizes state derivation and key-based resetting to avoid extra render cycles.
+ *
  * @param {Object} props - Component props.
  * @param {boolean} props.isOpen - Whether the modal is visible.
  * @param {Function} props.onClose - Function to close the modal.
  * @param {Object} props.product - The product object to display.
  */
 function QuickViewModal({ isOpen, onClose, product }) {
-  const [selectedVariant, setSelectedVariant] = useState(null);
-
-  useEffect(() => {
-    if (product?.variants?.length > 0) {
-      setSelectedVariant(product.variants[0]);
-    } else {
-      setSelectedVariant(null);
-    }
-  }, [product]);
+  // Derive initial variant state directly on mount instead of syncing with a useEffect
+  const [selectedVariant, setSelectedVariant] = useState(() => {
+    return product?.variants?.length > 0 ? product.variants[0] : null;
+  });
 
   if (!product) return null;
 
   return (
-    <PopUpModal isOpen={isOpen} onClose={onClose} className="w-full max-w-5xl !bg-white p-0">
+    <PopUpModal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      className="w-full max-w-5xl !bg-white p-0"
+      aria-labelledby="quick-view-title"
+    >
       <div className="relative flex flex-col flex-1 min-h-0">
         {/* Close Button */}
         <button 

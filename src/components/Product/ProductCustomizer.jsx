@@ -45,8 +45,6 @@ function ProductCustomizer({ isOpen, onClose, onApply, currentCustomization }) {
   const [backEmblemAlignment, setBackEmblemAlignment] = useState(currentCustomization?.backEmblemAlignment || 'center');
   const [viewMode, setViewMode] = useState('front');
 
-  if (!isOpen) return null;
-
   const handleApply = () => {
     onApply({
       emblem: selectedEmblem,

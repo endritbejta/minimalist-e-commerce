@@ -5,7 +5,7 @@ import ProductMedia from './ProductMedia';
 import ProductInfo from './ProductInfo';
 import ProductPrice from './ProductPrice';
 import BuyButton from '../UI/BuyButton';
-import { useModal } from '../../context/useModal.jsx';
+import { useModal } from '../../context/ModalContext.jsx';
 import QuickViewModal from './QuickViewModal';
 
 /**
