@@ -1,77 +1,83 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { formatPrice } from '../../lib/format';
+import { prefersReducedMotion } from '../../lib/motion';
 
 /**
  * AnimatedPrice Component
- * Smoothly animates a numeric value from its previous state to a new one using requestAnimationFrame.
- * 
+ * Counts a price up or down to its new value using requestAnimationFrame.
+ * Honours the OS reduce-motion preference by jumping straight to the total.
+ *
  * @param {Object} props - Component props.
  * @param {number} props.value - The target numeric value to animate to.
  * @param {number} [props.duration=600] - Duration of the animation in milliseconds.
  */
 function AnimatedPrice({ value, duration = 600 }) {
-  // Ensure we are working with numbers to prevent errors with toFixed or arithmetic
   const targetValue = Number(value) || 0;
   const animDuration = Number(duration) || 600;
 
   const [displayValue, setDisplayValue] = useState(targetValue);
-  const [isAnimating, setIsAnimating] = useState(false);
   const currentValueRef = useRef(targetValue);
 
+  // Derived rather than stored: the shine is on precisely while the displayed
+  // figure has not caught up with the target.
+  const isAnimating = displayValue !== targetValue;
+
   useEffect(() => {
-    let startTimestamp = null;
     const startValue = currentValueRef.current;
-    const endValue = targetValue;
-    
 
-    if (startValue === endValue) {
-      setIsAnimating(false);
-      return;
-    }
+    if (startValue === targetValue) return undefined;
 
-    setIsAnimating(true);
-    let frameId;
+    let startTimestamp = null;
+    let frameId = null;
 
     const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
+      // Settle immediately when the visitor has asked for reduced motion. Done
+      // on the first frame rather than in the effect body, which would trigger
+      // a cascading render.
+      if (prefersReducedMotion()) {
+        currentValueRef.current = targetValue;
+        setDisplayValue(targetValue);
+        return;
+      }
+
+      startTimestamp ??= timestamp;
       const progress = Math.min((timestamp - startTimestamp) / animDuration, 1);
-      
-      // Easing function: easeOutExpo for a snappy start that smoothly slows down
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      
-      const currentVal = startValue + (endValue - startValue) * easeProgress;
-      setDisplayValue(currentVal);
-      currentValueRef.current = currentVal;
+
+      // easeOutExpo: quick off the mark, gentle at the end.
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const currentValue = startValue + (targetValue - startValue) * eased;
+
+      currentValueRef.current = currentValue;
+      setDisplayValue(currentValue);
 
       if (progress < 1) {
         frameId = window.requestAnimationFrame(step);
       } else {
-        setDisplayValue(endValue);
-        currentValueRef.current = endValue;
-        setIsAnimating(false);
+        currentValueRef.current = targetValue;
+        setDisplayValue(targetValue);
       }
     };
 
     frameId = window.requestAnimationFrame(step);
 
     return () => {
-      if (frameId) {
-        window.cancelAnimationFrame(frameId);
-      }
+      if (frameId) window.cancelAnimationFrame(frameId);
     };
   }, [targetValue, animDuration]);
 
-  // Return the formatted price with a dollar sign and a sweep effect during animation
   return (
     <span className="relative inline-block tabular-nums overflow-hidden">
-      <span className={`block transition-all duration-300 ${isAnimating ? 'is-animating-price' : 'text-inherit scale-100'}`}>
-        ${displayValue.toFixed(2)}
+      {/* The animated figure is decorative mid-count; the settled total below
+          is what assistive technology announces. */}
+      <span
+        aria-hidden="true"
+        className={`block transition-all duration-300 ${
+          isAnimating ? 'is-animating-price' : 'text-inherit scale-100'
+        }`}
+      >
+        {formatPrice(displayValue)}
       </span>
-      {/* Sweeping Shine Overlay */}
-      {isAnimating && (
-        <span 
-          className="absolute inset-y-0 -inset-x-full w-[300%] bg-gradient-to-r from-transparent via-white to-transparent opacity-60 pointer-events-none animate-sweep-left mix-blend-overlay"
-        />
-      )}
+      <span className="sr-only">{formatPrice(targetValue)}</span>
     </span>
   );
 }

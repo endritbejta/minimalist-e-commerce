@@ -1,79 +1,105 @@
-import { useState, useRef, useEffect } from 'react';
-import { 
-  BsSortAlphaDown, 
-  BsSortAlphaUp, 
-  BsSortNumericDown, 
+import { useEffect, useRef, useState } from 'react';
+import {
+  BsSortAlphaDown,
+  BsSortAlphaUp,
+  BsSortNumericDown,
   BsSortNumericUp,
-  BsFunnel
+  BsFunnel,
 } from 'react-icons/bs';
+
+const SORT_OPTIONS = [
+  { id: 'featured', label: 'Featured', Icon: BsFunnel },
+  { id: 'az', label: 'A - Z', Icon: BsSortAlphaDown },
+  { id: 'za', label: 'Z - A', Icon: BsSortAlphaUp },
+  { id: 'price-low', label: 'Price: Low', Icon: BsSortNumericDown },
+  { id: 'price-high', label: 'Price: High', Icon: BsSortNumericUp },
+];
 
 /**
  * SortDropdown Component
- * A custom dropdown menu for selecting product sorting options.
+ * A menu for choosing how products are ordered.
  * @param {Object} props - Component props.
- * @param {string} props.sortBy - The currently selected sort option ID.
+ * @param {string} props.sortBy - The currently selected sort option id.
  * @param {Function} props.setSortBy - Callback to update the sort option.
  */
 const SortDropdown = ({ sortBy, setSortBy }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const containerRef = useRef(null);
+  const triggerRef = useRef(null);
 
-  // Close when clicking outside
+  const currentOption = SORT_OPTIONS.find((option) => option.id === sortBy) ?? SORT_OPTIONS[0];
+  const isDefault = currentOption.id === 'featured';
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (!isOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!containerRef.current?.contains(event.target)) {
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+
+      setIsOpen(false);
+      triggerRef.current?.focus();
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen]);
 
-  const handleSort = (option) => {
-    setSortBy(option);
+  const handleSort = (optionId) => {
+    setSortBy(optionId);
     setIsOpen(false);
+    triggerRef.current?.focus();
   };
 
-  const sortOptions = [
-    { id: 'az', label: 'A - Z', icon: <BsSortAlphaDown size={16} /> },
-    { id: 'za', label: 'Z - A', icon: <BsSortAlphaUp size={16} /> },
-    { id: 'price-low', label: 'Price: Low', icon: <BsSortNumericDown size={16} /> },
-    { id: 'price-high', label: 'Price: High', icon: <BsSortNumericUp size={16} /> },
-    { id: 'featured', label: 'Clear Filters', icon: <BsFunnel size={16} /> },
-  ];
-
-  const currentOption = sortOptions.find(opt => opt.id === sortBy) || sortOptions[sortOptions.length - 1];
-  const isDefault = sortBy === 'featured';
+  const { Icon: CurrentIcon } = currentOption;
 
   return (
-    <div className="relative h-full" ref={dropdownRef}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-gray-100 p-2.5 rounded-md hover:bg-gray-200 transition-all text-gray-700 h-full px-4"
+    <div className="relative h-full" ref={containerRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="flex items-center gap-2 bg-gray-100 p-2.5 rounded-md hover:bg-gray-200 transition-all text-gray-700 h-full px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
       >
-        {isDefault ? <BsFunnel size={16} /> : currentOption.icon}
+        <CurrentIcon size={16} aria-hidden="true" />
         <span className="text-[10px] font-bold uppercase tracking-widest">
           {isDefault ? 'Sort' : currentOption.label}
         </span>
       </button>
-      
-      {/* Dropdown Menu */}
-      <div className={`absolute left-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl transition-all z-20 overflow-hidden transform origin-top-left ${
-        isOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'
-      }`}>
+
+      {/* `invisible` (not just opacity) keeps the closed menu out of the tab order. */}
+      <div
+        role="menu"
+        aria-label="Sort products"
+        className={`absolute left-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl transition-all z-menu overflow-hidden transform origin-top-left ${
+          isOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'
+        }`}
+      >
         <div className="p-2 space-y-1">
-          {sortOptions.map((option) => (
-            <button 
-              key={option.id}
-              onClick={() => handleSort(option.id)}
-              className={`flex items-center gap-3 w-full p-3 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors ${
-                sortBy === option.id ? 'bg-black text-white' : 'hover:bg-gray-50 text-gray-600'
+          {SORT_OPTIONS.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              role="menuitemradio"
+              aria-checked={sortBy === id}
+              onClick={() => handleSort(id)}
+              className={`flex items-center gap-3 w-full p-3 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                sortBy === id ? 'bg-black text-white' : 'hover:bg-gray-50 text-gray-600'
               }`}
             >
-              {option.icon} {option.label}
+              <Icon size={16} aria-hidden="true" /> {label}
             </button>
           ))}
         </div>

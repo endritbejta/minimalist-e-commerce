@@ -1,24 +1,23 @@
-
-import './App.css'
-
 import HeroBanner from "./components/Home/HeroBanner";
 import FeaturedTabs from "./components/Home/FeaturedTabs";
 import PromoGrid from "./components/Home/PromoGrid";
-
 import SEO from "./components/UI/SEO";
+import { SITE } from "./lib/site";
 
 /**
- * App Component
- * The entry point for the home page, composing the main marketing sections.
+ * Home Page
+ * Composes the marketing sections shown at the root route.
  */
-function App() {
+function Home() {
   return (
     <div className="home-page">
-      <SEO 
+      <SEO
         title="Premium Minimalist Essentials"
-        description="Curating the finest minimalist tech, accessories, and apparel for your modern lifestyle. Quality over quantity, always."
+        description={SITE.description}
         keywords="minimalist, tech accessories, apparel, premium quality, modern lifestyle"
       />
+      {/* The carousel headings are h2s, so the page needs its own single h1. */}
+      <h1 className="sr-only">{SITE.name} — {SITE.tagline}</h1>
       <HeroBanner />
       <FeaturedTabs />
       <PromoGrid />
@@ -26,5 +25,4 @@ function App() {
   );
 }
 
-
-export default App;
+export default Home;
