@@ -21,27 +21,45 @@ function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <header className="flex justify-between items-center p-3 md:p-5 border-b sticky top-0 bg-white z-header">
-            {/* Mobile Menu Button */}
-            <button
-                type="button"
-                onClick={() => setIsMenuOpen(true)}
-                className="p-3 hover:bg-gray-100 rounded-full md:hidden"
-                aria-label="Open menu"
-                aria-expanded={isMenuOpen}
-                aria-haspopup="dialog"
-            >
-                <BsList size={24} />
-            </button>
+        <header className="flex items-center gap-2 px-3 py-2 lg:px-5 lg:py-4 border-b sticky top-0 bg-white z-header">
+            {/*
+              The menu button and the actions are different widths, so
+              justify-between could never centre the wordmark between them.
+              Giving both sides flex-1 makes them share the leftover space
+              equally, which puts the wordmark on the real centre line.
+            */}
+            <div className="flex flex-1 items-center lg:hidden">
+                <button
+                    type="button"
+                    onClick={() => setIsMenuOpen(true)}
+                    className="p-2 hover:bg-gray-100 rounded-full"
+                    aria-label="Open menu"
+                    aria-expanded={isMenuOpen}
+                    aria-haspopup="dialog"
+                >
+                    <BsList size={24} />
+                </button>
+            </div>
 
-            <div className="logo-holder font-bold text-xl">
-                <NavLink to="/">{SITE.name.toUpperCase()}</NavLink>
+            <div className="logo-holder flex-none font-bold">
+                {/* The full name needs 242px at text-xl but only 207px is free
+                    on a 375px screen, so it wrapped to two lines and made the
+                    sticky header 81px tall. Short form on phones, full name
+                    from md up; the link keeps the full name either way. */}
+                <NavLink to="/" aria-label={SITE.name}>
+                    <span className="text-lg tracking-tight sm:hidden">
+                        {SITE.shortName.toUpperCase()}
+                    </span>
+                    <span className="hidden text-xl sm:inline">
+                        {SITE.name.toUpperCase()}
+                    </span>
+                </NavLink>
             </div>
 
             {/* Desktop Navigation */}
             <nav
                 aria-label="Main"
-                className="hidden md:flex gap-6 text-sm uppercase tracking-widest font-medium"
+                className="hidden lg:flex lg:flex-1 lg:justify-center gap-4 xl:gap-6 text-sm uppercase tracking-wide xl:tracking-widest font-medium"
             >
                 <NavLink to="/" className={navLinkClasses}>Home</NavLink>
                 {COLLECTIONS.map((collection) => (
@@ -55,7 +73,7 @@ function Header() {
                 ))}
             </nav>
 
-            <div className="header-right relative flex items-center gap-2">
+            <div className="header-right relative flex flex-1 items-center justify-end gap-1 lg:flex-none lg:gap-2">
                 <GlobalSearch />
 
                 <button
@@ -63,7 +81,7 @@ function Header() {
                     ref={registerCartTarget}
                     type="button"
                     onClick={toggleCart}
-                    className="p-3 hover:bg-gray-100 rounded-full transition-colors relative"
+                    className="p-2 lg:p-3 hover:bg-gray-100 rounded-full transition-colors relative"
                     aria-label={
                         cartCount > 0
                             ? `Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`
