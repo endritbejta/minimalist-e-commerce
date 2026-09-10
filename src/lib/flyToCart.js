@@ -12,7 +12,7 @@ export const FLY_SIZE_PX = 64;
 // product. Phones get a smaller one.
 export const FLY_SIZE_COMPACT_PX = 44;
 const COMPACT_VIEWPORT_PX = 640;
-export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
+export const FLY_EASING = 'cubic-bezier(.53,.45,.33,1.06)';
 
 /**
  * The four routes a disc can take. One is chosen at random per click so
