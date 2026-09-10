@@ -5,15 +5,19 @@ import { BsX } from "react-icons/bs";
  * The top bar of the cart drawer, containing the title and close action.
  * @param {Object} props - Component props.
  * @param {Function} props.onClose - Function to close the cart drawer.
+ * @param {string} props.titleId - Id linking the heading to the dialog's aria-labelledby.
  */
-function CartDrawerHeader({ onClose }) {
+function CartDrawerHeader({ onClose, titleId }) {
     return (
         <div className="flex justify-between items-center p-4 border-b">
-            <h2 className="text-xl font-bold uppercase tracking-tight">Shopping Bag</h2>
+            <h2 id={titleId} className="text-xl font-bold uppercase tracking-tight">
+                Shopping Bag
+            </h2>
             <button
+                type="button"
                 onClick={onClose}
                 className="p-3 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Close Cart"
+                aria-label="Close cart"
             >
                 <BsX size={28} />
             </button>

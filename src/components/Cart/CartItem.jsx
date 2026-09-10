@@ -1,17 +1,20 @@
 import { useEffect, useRef } from "react";
 import { BsTrash } from "react-icons/bs";
-import { useCart } from "../../context/CartContext.jsx";
+import { useCart } from "../../context/CartContext";
+import { describeCustomization } from "../../lib/emblem";
+import { formatPrice } from "../../lib/format";
 import QuantitySelector from "../UI/QuantitySelector";
+import SmartImage from "../UI/SmartImage";
 
 /**
  * CartItem Component
- * Renders a single product row in the cart with quantity controls and remove animation.
+ * Renders a single line in the cart with quantity controls and remove animation.
  * @param {Object} props - Component props.
- * @param {Object} props.item - The cart item data.
- * @param {boolean} [props.isRemoving=false] - Whether the item is currently being removed.
- * @param {string} [props.removeDirection='right'] - Direction of the slide-out animation ('left' or 'right').
+ * @param {Object} props.item - The cart line data.
+ * @param {boolean} [props.isRemoving=false] - Whether the line is currently being removed.
+ * @param {'left'|'right'} [props.removeDirection='right'] - Direction of the slide-out animation.
  * @param {Function} props.onRemoveRequest - Callback to initiate removal.
- * @param {Function} props.onRemoveAnimationEnd - Callback after removal animation finishes.
+ * @param {Function} props.onRemoveAnimationEnd - Callback after the removal animation finishes.
  */
 function CartItem({
     item,
@@ -22,25 +25,22 @@ function CartItem({
 }) {
     const { updateQuantity } = useCart();
     const rowRef = useRef(null);
+    const customizationSummary = describeCustomization(item.customization);
 
+    // Capture the row's natural height so it can collapse to zero smoothly.
     useEffect(() => {
-        if (!isRemoving || !rowRef.current) {
-            return;
-        }
+        if (!isRemoving || !rowRef.current) return;
 
-        rowRef.current.style.setProperty('--cart-item-height', `${rowRef.current.scrollHeight}px`);
+        rowRef.current.style.setProperty(
+            '--cart-item-height',
+            `${rowRef.current.scrollHeight}px`
+        );
     }, [isRemoving]);
 
-    const handleRemoveClick = () => {
-        onRemoveRequest(item.id);
-    };
-
     const handleAnimationEnd = (event) => {
-        if (!isRemoving || event.animationName !== 'cartItemCollapseOut') {
-            return;
-        }
+        if (!isRemoving || event.animationName !== 'cartItemCollapseOut') return;
 
-        onRemoveAnimationEnd(item.id);
+        onRemoveAnimationEnd(item.lineId);
     };
 
     return (
@@ -56,11 +56,12 @@ function CartItem({
             <div className="cart-item-content flex gap-4 group py-4">
                 {/* Item Image */}
                 <div className="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
-                    {(item.images?.[0] || item.image) ? (
-                        <img
-                            src={item.images?.[0] || item.image}
+                    {item.image ? (
+                        <SmartImage
+                            src={item.image}
                             alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full"
+                            imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 uppercase tracking-widest">
@@ -77,10 +78,11 @@ function CartItem({
                                 {item.title}
                             </h3>
                             <button
-                                onClick={handleRemoveClick}
+                                type="button"
+                                onClick={() => onRemoveRequest(item.lineId)}
                                 disabled={isRemoving}
                                 className="text-gray-300 hover:text-red-500 transition-colors p-2 -mr-1 -mt-1"
-                                aria-label="Remove item"
+                                aria-label={`Remove ${item.title} from cart`}
                             >
                                 <BsTrash size={16} />
                             </button>
@@ -88,19 +90,25 @@ function CartItem({
                         <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                             {item.collection}
                         </p>
+                        {customizationSummary && (
+                            <p className="text-[10px] text-gray-500 mb-2 flex items-start gap-1.5">
+                                <span aria-hidden="true">✦</span>
+                                <span className="min-w-0">{customizationSummary}</span>
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex justify-between items-end">
-                        {/* Quantity Controls */}
                         <QuantitySelector
                             quantity={item.quantity}
-                            onIncrease={() => !isRemoving && updateQuantity(item.id, 1)}
-                            onDecrease={() => !isRemoving && updateQuantity(item.id, -1)}
+                            label={item.title}
+                            disabled={isRemoving}
+                            onIncrease={() => updateQuantity(item.lineId, 1)}
+                            onDecrease={() => updateQuantity(item.lineId, -1)}
                         />
 
-                        {/* Item Total Price */}
                         <p className="font-bold text-sm text-gray-900">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.price * item.quantity)}
                         </p>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom"
 import { BsCartCheck, BsList } from "react-icons/bs";
-import { useCart } from "../context/CartContext.jsx";
+import { useCart } from "../context/CartContext";
 import MobileMenu from "./MobileMenu";
 import GlobalSearch from "../components/UI/GlobalSearch";
 
