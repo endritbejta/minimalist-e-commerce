@@ -1,23 +1,27 @@
 import { useState } from 'react';
-import { BsGrid, BsGrid3X3Gap } from 'react-icons/bs';
+import { BsGrid, BsSquare } from 'react-icons/bs';
 import { useSortedProducts } from '../../hooks/useSortedProducts';
 import AnimatedHeading from '../UI/AnimatedHeading';
 import Breadcrumbs from '../UI/Breadcrumbs';
 import ProductCard from '../Product/ProductCard';
 import SortDropdown from './SortDropdown';
 
+// Keyed by how many products sit in a row on the narrowest screens; each view
+// then opens up at wider breakpoints. Two per row is the default.
 const GRID_VIEWS = {
-  2: {
-    label: 'Comfortable, 2 columns',
-    Icon: BsGrid,
-    classes: 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  1: {
+    label: 'One product per row',
+    Icon: BsSquare,
+    classes: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3',
   },
-  3: {
-    label: 'Compact, 3 columns',
-    Icon: BsGrid3X3Gap,
-    classes: 'grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6',
+  2: {
+    label: 'Two products per row',
+    Icon: BsGrid,
+    classes: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4',
   },
 };
+
+const DEFAULT_VIEW = 2;
 
 const PRIORITY_IMAGE_COUNT = 4;
 
@@ -29,11 +33,11 @@ const PRIORITY_IMAGE_COUNT = 4;
  * @param {string} props.title - Display name of the collection.
  */
 function CollectionGrid({ products, title }) {
-  const [viewCols, setViewCols] = useState(2);
+  const [viewCols, setViewCols] = useState(DEFAULT_VIEW);
   const [sortBy, setSortBy] = useState('featured');
 
   const sortedProducts = useSortedProducts(products, sortBy);
-  const view = GRID_VIEWS[viewCols] ?? GRID_VIEWS[2];
+  const view = GRID_VIEWS[viewCols] ?? GRID_VIEWS[DEFAULT_VIEW];
 
   return (
     <div className="pt-6">
@@ -46,7 +50,7 @@ function CollectionGrid({ products, title }) {
         {title}
       </AnimatedHeading>
 
-      <div className="flex justify-stretch md:justify-between gap-2 items-center mb-6 space-x-4 border-b pb-4 flex-wrap">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 border-b pb-4">
         <Breadcrumbs />
         <div className="flex items-center gap-3 w-full justify-between">
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
