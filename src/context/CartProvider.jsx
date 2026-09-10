@@ -26,9 +26,12 @@ export const CartProvider = ({ children }) => {
   const openCart = useCallback(() => dispatch({ type: 'OPEN_CART' }), [dispatch]);
   const closeCart = useCallback(() => dispatch({ type: 'CLOSE_CART' }), [dispatch]);
 
+  // Adding does not open the drawer. The disc flying into the cart and the
+  // count ticking up already say the item went in, and the drawer used to slide
+  // over the cart icon at the exact moment it bumped — hiding the confirmation
+  // it was duplicating, and interrupting anyone adding more than one thing.
   const addToCart = useCallback((product, quantity = DEFAULT_QUANTITY) => {
     dispatch({ type: 'ADD_TO_CART', payload: { ...product, quantity } });
-    dispatch({ type: 'OPEN_CART' });
   }, [dispatch]);
 
   const updateQuantity = useCallback((lineId, amount) => {

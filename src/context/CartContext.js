@@ -19,7 +19,7 @@ import { createContext, use } from 'react';
  * @property {() => void} toggleCart - Opens the cart if closed, closes it if open.
  * @property {() => void} openCart - Opens the cart drawer.
  * @property {() => void} closeCart - Closes the cart drawer.
- * @property {(product: Object, quantity?: number) => void} addToCart - Adds a product and opens the cart.
+ * @property {(product: Object, quantity?: number) => void} addToCart - Adds a product to the cart. Does not open the drawer.
  * @property {(lineId: string, amount: number) => void} updateQuantity - Adds `amount` to a line's quantity. Removes it at 0.
  * @property {(lineId: string) => void} removeFromCart - Removes a line.
  * @property {() => void} clearCart - Removes all cart lines.

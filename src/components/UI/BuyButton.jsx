@@ -16,8 +16,9 @@ const VARIANTS = {
 /**
  * BuyButton Component
  * Adds a product to the cart, sending a small image of it arcing to the cart
- * icon on the way. The item is added and the drawer opens when the disc lands,
- * so the count changes at the moment the shopper sees it arrive.
+ * icon on the way. The item is added when the disc lands, so the count changes
+ * at the moment the shopper sees it arrive. The drawer is left alone — the
+ * flight and the count are the confirmation.
  *
  * @param {Object} props - Component props.
  * @param {Object} props.product - Product object to add to cart.
