@@ -6,7 +6,7 @@
  * list ready for Element.animate().
  */
 
-export const FLY_DURATION_MS = 720;
+export const FLY_DURATION_MS = 1000;
 export const FLY_SIZE_PX = 64;
 export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
 
