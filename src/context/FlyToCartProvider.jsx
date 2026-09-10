@@ -6,6 +6,7 @@ import {
   buildCartBumpKeyframes,
   buildFlightKeyframes,
   getFlightStyle,
+  pickFlightPath,
 } from '../lib/flyToCart';
 import { prefersReducedMotion } from '../lib/motion';
 import { FlyToCartContext } from './FlyToCartContext';
@@ -28,7 +29,7 @@ function FlyingItem({ flight, onLanded }) {
     if (!element) return undefined;
 
     const animation = element.animate(
-      buildFlightKeyframes(flight.originRect, flight.targetRect),
+      buildFlightKeyframes(flight.originRect, flight.targetRect, flight.path),
       { duration: FLY_DURATION_MS, easing: FLY_EASING, fill: 'forwards' }
     );
 
@@ -120,7 +121,11 @@ export const FlyToCartProvider = ({ children }) => {
         window.setTimeout(() => handleLanded(id), FLY_DURATION_MS + 250)
       );
 
-      setFlights((current) => [...current, { id, image, originRect, targetRect }]);
+      // Chosen once, here, so a re-render cannot swap the route mid-flight.
+      setFlights((current) => [
+        ...current,
+        { id, image, originRect, targetRect, path: pickFlightPath() },
+      ]);
     });
   }, [handleLanded]);
 

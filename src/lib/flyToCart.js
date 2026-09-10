@@ -6,14 +6,86 @@
  * list ready for Element.animate().
  */
 
-export const FLY_DURATION_MS = 620;
+export const FLY_DURATION_MS = 720;
 export const FLY_SIZE_PX = 64;
-export const FLY_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
+
+/**
+ * The four routes a disc can take. One is chosen at random per click so
+ * repeated adds do not trace the same line over and over.
+ */
+export const FLIGHT_PATHS = ['soarOver', 'hookBack', 'dipUnder', 'sweepPast'];
+
+// The curve is sampled into this many keyframes. Element.animate() interpolates
+// linearly between them, so enough points are needed for the path to read as a
+// curve rather than a series of straight segments.
+const SAMPLE_COUNT = 30;
 
 const centerOf = (rect) => ({
   x: rect.left + rect.width / 2,
   y: rect.top + rect.height / 2,
 });
+
+/**
+ * How much of the flight is spent winding up before the disc sets off.
+ */
+const RECOIL_FRACTION = 0.18;
+
+/**
+ * The routes, in a space where the button sits at (0, 0), the cart at (dx, dy),
+ * and y grows downward — so the cart is usually at a negative y and "dipping
+ * down" means a positive one.
+ *
+ * Each route is two phases. First the disc pulls back to `recoil`, away from
+ * the cart, as a wind-up. Then it travels from there to the cart along a cubic
+ * Bézier shaped by `controls`. Doing the recoil as its own phase, rather than
+ * as a backward control point on one long curve, is what makes it actually
+ * visible — a single Bézier absorbs the backward pull into the forward swing.
+ *
+ * `back` is the wind-up distance, `lift` the height of the swing, and `awayX`
+ * points horizontally away from the cart.
+ */
+const ROUTES = {
+  // A short pull back, then a high sail over the page into the cart.
+  soarOver: {
+    recoil: (back, awayX) => ({ x: awayX * back * 0.55, y: back * 0.3 }),
+    controls: (dx, dy, lift) => [
+      { x: dx * 0.15, y: dy * 0.15 - lift },
+      { x: dx * 0.7, y: dy * 0.55 - lift * 0.6 },
+    ],
+  },
+  // The longest wind-up: well back and below, then one big sweep up.
+  hookBack: {
+    recoil: (back, awayX) => ({ x: awayX * back, y: back * 0.75 }),
+    controls: (dx, dy, lift) => [
+      { x: dx * 0.1, y: dy * 0.1 - lift * 0.4 },
+      { x: dx * 0.55, y: dy * 0.35 - lift },
+    ],
+  },
+  // Pulls back and drops, then runs low before climbing steeply at the cart.
+  dipUnder: {
+    recoil: (back, awayX) => ({ x: awayX * back * 0.45, y: back * 1.15 }),
+    controls: (dx, dy, lift, back) => [
+      { x: dx * 0.15, y: back * 1.4 },
+      { x: dx * 1.05, y: dy * 0.12 },
+    ],
+  },
+  // Pulls back level, then races past the cart and curls back into it.
+  sweepPast: {
+    recoil: (back, awayX) => ({ x: awayX * back * 0.8, y: back * 0.15 }),
+    controls: (dx, dy, lift) => [
+      { x: dx * 0.45, y: dy * 0.1 - lift * 0.5 },
+      { x: dx * 1.3, y: dy * 0.8 - lift * 0.1 },
+    ],
+  },
+};
+
+/**
+ * Picks a route at random.
+ * @returns {string} One of FLIGHT_PATHS.
+ */
+export const pickFlightPath = () =>
+  FLIGHT_PATHS[Math.floor(Math.random() * FLIGHT_PATHS.length)];
 
 /**
  * Fixed-position placement for the flying element, centred over its origin.
@@ -33,39 +105,76 @@ export const getFlightStyle = (originRect, size = FLY_SIZE_PX) => {
   };
 };
 
+// Cubic Bézier through four points.
+const cubicAt = (u, p0, p1, p2, p3) => {
+  const m = 1 - u;
+  const a = m * m * m;
+  const b = 3 * m * m * u;
+  const c = 3 * m * u * u;
+  const d = u * u * u;
+
+  return {
+    x: a * p0.x + b * p1.x + c * p2.x + d * p3.x,
+    y: a * p0.y + b * p1.y + c * p2.y + d * p3.y,
+  };
+};
+
 /**
- * Keyframes describing an arc from the button to the cart.
+ * Keyframes tracing one of the routes from the button to the cart.
  *
- * The midpoint is lifted above the straight line so the disc travels along a
- * curve rather than sliding flatly across the page, and it shrinks as it goes
- * so it reads as being drawn into the cart.
+ * The disc shrinks as it travels and fades only at the very end, so it reads as
+ * being drawn into the cart rather than dissolving on the way.
  *
  * @param {{left: number, top: number, width: number, height: number}} originRect - The clicked button.
  * @param {{left: number, top: number, width: number, height: number}} targetRect - The cart button.
+ * @param {string} [path='soarOver'] - Which route to trace; see FLIGHT_PATHS.
  * @returns {Object[]} Keyframes for Element.animate().
  */
-export const buildFlightKeyframes = (originRect, targetRect) => {
+export const buildFlightKeyframes = (originRect, targetRect, path = 'soarOver') => {
   const origin = centerOf(originRect);
   const target = centerOf(targetRect);
 
   const dx = target.x - origin.x;
   const dy = target.y - origin.y;
 
-  // Longer journeys arc higher, but not without limit.
-  const arc = Math.min(180, 60 + Math.abs(dx) * 0.35);
+  // Longer journeys swing wider and wind up further, but not without limit.
+  const distance = Math.hypot(dx, dy);
+  const lift = Math.min(240, 90 + distance * 0.18);
+  const back = Math.min(130, 50 + distance * 0.07);
+  // Away from the cart horizontally — the direction the wind-up travels.
+  const awayX = -Math.sign(dx || 1);
 
-  // Built through one helper so every frame is written the same way.
-  const frame = (x, y, scale, opacity, offset) => ({
-    transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-    opacity,
-    offset,
+  const route = ROUTES[path] ?? ROUTES.soarOver;
+  const recoil = route.recoil(back, awayX);
+  const [c1, c2] = route.controls(dx, dy, lift, back);
+  const destination = { x: dx, y: dy };
+
+  return Array.from({ length: SAMPLE_COUNT }, (_, index) => {
+    const t = index / (SAMPLE_COUNT - 1);
+    let point;
+    let scale;
+
+    if (t <= RECOIL_FRACTION) {
+      // Wind-up: ease out into the pull-back, swelling slightly as it loads.
+      const u = t / RECOIL_FRACTION;
+      const eased = 1 - (1 - u) * (1 - u);
+      point = { x: recoil.x * eased, y: recoil.y * eased };
+      scale = 1 + 0.08 * eased;
+    } else {
+      // Flight: from the wound-up position to the cart.
+      const u = (t - RECOIL_FRACTION) / (1 - RECOIL_FRACTION);
+      point = cubicAt(u, recoil, c1, c2, destination);
+      scale = 1.08 - 0.93 * Math.pow(u, 1.5);
+    }
+
+    const opacity = t < 0.85 ? 1 : 1 - 0.8 * ((t - 0.85) / 0.15);
+
+    return {
+      transform: `translate3d(${point.x.toFixed(2)}px, ${point.y.toFixed(2)}px, 0) scale(${scale.toFixed(3)})`,
+      opacity: Number(opacity.toFixed(3)),
+      offset: Number(t.toFixed(4)),
+    };
   });
-
-  return [
-    frame(0, 0, 1, 1, 0),
-    frame(dx * 0.5, dy * 0.5 - arc, 0.7, 1, 0.55),
-    frame(dx, dy, 0.15, 0.2, 1),
-  ];
 };
 
 /**
