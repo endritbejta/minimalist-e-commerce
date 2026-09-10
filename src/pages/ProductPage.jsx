@@ -4,7 +4,7 @@ import { products } from '../data/products';
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 import ProductPageMedia from '../components/Product/ProductPageMedia';
 import ProductPageInformation from '../components/Product/ProductPageInformation';
-import { CustomizationProvider } from '../context/CustomizationContext';
+import { CustomizationProvider } from '../context/CustomizationProvider';
 import SEO from '../components/UI/SEO';
 
 /**

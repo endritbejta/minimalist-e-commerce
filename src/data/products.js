@@ -7,9 +7,7 @@ export const products = [
     handle: "classic-wristwatch",
     collection: "accessories",
     images: [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "A timeless minimalist watch with a genuine leather strap.",
   },
@@ -20,9 +18,7 @@ export const products = [
     handle: "leather-backpack",
     collection: "accessories",
     images: [
-      "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Durable and stylish backpack made from top-grain leather.",
   },
@@ -33,9 +29,7 @@ export const products = [
     handle: "minimalist-wallet",
     collection: "accessories",
     images: [
-      "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Slim RFID-blocking wallet for modern essentials.",
   },
@@ -46,9 +40,7 @@ export const products = [
     handle: "polarized-sunglasses",
     collection: "accessories",
     images: [
-      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Classic frame with high-quality polarized lenses.",
   },
@@ -59,9 +51,7 @@ export const products = [
     handle: "canvas-weekender",
     collection: "accessories",
     images: [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Spacious bag perfect for short trips and getaways.",
   },
@@ -74,9 +64,7 @@ export const products = [
     handle: "wireless-headphones",
     collection: "electronics",
     images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
     ],
     description:
       "High-fidelity noise-cancelling headphones for immersive sound.",
@@ -88,9 +76,7 @@ export const products = [
     handle: "smart-speaker",
     collection: "electronics",
     images: [
-      "https://images.unsplash.com/photo-1543512214-318c7553f230?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1543512214-318c7553f230?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Voice-controlled speaker with crystal clear audio.",
   },
@@ -101,9 +87,7 @@ export const products = [
     handle: "mechanical-keyboard",
     collection: "electronics",
     images: [
-      "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Tactile mechanical keyboard with customizable RGB.",
   },
@@ -114,9 +98,7 @@ export const products = [
     handle: "wireless-trackpad",
     collection: "electronics",
     images: [
-      "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=900&auto=format&fit=crop"
     ],
     description: "Sleek glass surface with multi-touch support.",
   },
@@ -127,9 +109,7 @@ export const products = [
     handle: "power-bank",
     collection: "electronics",
     images: [
-      "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Fast-charging high-capacity battery for all your devices.",
   },
@@ -142,9 +122,7 @@ export const products = [
     handle: "designer-lamp",
     collection: "office",
     images: [
-      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Modern adjustable desk lamp with warm LED lighting.",
   },
@@ -155,9 +133,7 @@ export const products = [
     handle: "ergonomic-chair",
     collection: "office",
     images: [
-      "https://images.unsplash.com/photo-1505798577917-a65157d3320a?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1505798577917-a65157d3320a?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Full-support mesh chair for long working hours.",
   },
@@ -168,9 +144,7 @@ export const products = [
     handle: "leather-desk-pad",
     collection: "office",
     images: [
-      "https://images.unsplash.com/photo-1585435557343-3b092031a831?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1585435557343-3b092031a831?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Smooth writing surface that protects your desk.",
   },
@@ -181,9 +155,7 @@ export const products = [
     handle: "monitor-stand",
     collection: "office",
     images: [
-      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Elevate your screen to eye level with sustainable style.",
   },
@@ -194,9 +166,7 @@ export const products = [
     handle: "digital-notebook",
     collection: "office",
     images: [
-      "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1544652478-6653e09f18a2?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Handwritten notes synced instantly to your cloud devices.",
   },
@@ -209,9 +179,7 @@ export const products = [
     handle: "water-bottle",
     collection: "lifestyle",
     images: [
-      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&auto=format&fit=crop"
     ],
     description: "Keeps drinks cold for 24 hours or hot for 12 hours.",
   },
@@ -222,9 +190,7 @@ export const products = [
     handle: "yoga-mat",
     collection: "lifestyle",
     images: [
-      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=1000&auto=format&fit=crop"
     ],
     description: "Non-slip natural rubber mat for your daily practice.",
   },
@@ -235,9 +201,7 @@ export const products = [
     handle: "scented-candle",
     collection: "lifestyle",
     images: [
-      "https://images.unsplash.com/photo-1603905179139-db12ab535ca9?w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1603905179139-db12ab535ca9?w=900&auto=format&fit=crop"
     ],
     description: "Hand-poured candle with notes of sandalwood and cedar.",
   },
@@ -248,9 +212,7 @@ export const products = [
     handle: "coffee-dripper",
     collection: "lifestyle",
     images: [
-      "https://images.unsplash.com/photo-1670237887785-db5c2b665116?w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1670237887785-db5c2b665116?w=900&auto=format&fit=crop"
     ],
     description: "Classic design for the perfect pour-over coffee.",
   },
@@ -261,9 +223,7 @@ export const products = [
     handle: "wool-blanket",
     collection: "lifestyle",
     images: [
-      "https://images.unsplash.com/photo-1711097258176-c1a4bb511aa7?q=80&w=2012&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1711097258176-c1a4bb511aa7?q=80&w=2012&auto=format&fit=crop"
     ],
     description: "Soft Merino wool blanket for cozy evenings.",
   },
@@ -274,6 +234,7 @@ export const products = [
     title: "Customizable T-shirt",
     price: 30,
     handle: "customizable-t-shirt",
+    customizable: true,
     collection: "apparel",
     variants: [
       {
@@ -306,9 +267,7 @@ export const products = [
       },
     ],
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1000&auto=format&fit=crop"
     ],
     description:
       "A premium quality plain black T-shirt, ready for your custom design.",
