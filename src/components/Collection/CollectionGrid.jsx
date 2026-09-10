@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BsGrid, BsSquare } from 'react-icons/bs';
+import { BsGrid, BsGrid3X3Gap, BsSquare } from 'react-icons/bs';
 import { useSortedProducts } from '../../hooks/useSortedProducts';
 import AnimatedHeading from '../UI/AnimatedHeading';
 import Breadcrumbs from '../UI/Breadcrumbs';
@@ -8,6 +8,11 @@ import SortDropdown from './SortDropdown';
 
 // Keyed by how many products sit in a row on the narrowest screens; each view
 // then opens up at wider breakpoints. Two per row is the default.
+//
+// The compact view only earns its place once there is width to spend, so its
+// button is hidden below lg — but its narrow-screen columns are still sensible,
+// so a visitor who picks it on a laptop and then narrows the window is not left
+// with an unreadable grid.
 const GRID_VIEWS = {
   1: {
     label: 'One product per row',
@@ -18,6 +23,12 @@ const GRID_VIEWS = {
     label: 'Two products per row',
     Icon: BsGrid,
     classes: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4',
+  },
+  3: {
+    label: 'Compact grid, more products per row',
+    Icon: BsGrid3X3Gap,
+    classes: 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7',
+    hiddenBelowLg: true,
   },
 };
 
@@ -56,7 +67,7 @@ function CollectionGrid({ products, title }) {
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
 
           <div className="flex bg-gray-100 p-1 rounded-md" role="group" aria-label="Grid density">
-            {Object.entries(GRID_VIEWS).map(([cols, { label, Icon }]) => {
+            {Object.entries(GRID_VIEWS).map(([cols, { label, Icon, hiddenBelowLg }]) => {
               const value = Number(cols);
               const isActive = viewCols === value;
 
@@ -68,6 +79,8 @@ function CollectionGrid({ products, title }) {
                   aria-pressed={isActive}
                   aria-label={label}
                   className={`p-2 rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${
+                    hiddenBelowLg ? 'hidden lg:inline-flex' : ''
+                  } ${
                     isActive ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-600'
                   }`}
                 >
