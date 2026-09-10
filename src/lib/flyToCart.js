@@ -6,7 +6,7 @@
  * list ready for Element.animate().
  */
 
-export const FLY_DURATION_MS = 1000;
+export const FLY_DURATION_MS = 900;
 export const FLY_SIZE_PX = 64;
 export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
 
@@ -14,7 +14,7 @@ export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
  * The four routes a disc can take. One is chosen at random per click so
  * repeated adds do not trace the same line over and over.
  */
-export const FLIGHT_PATHS = ['soarOver', 'hookBack', 'dipUnder', 'sweepPast'];
+export const FLIGHT_PATHS = ['dipUnder', 'dipLate', 'archOver', 'archEarly'];
 
 // The curve is sampled into this many keyframes. Element.animate() interpolates
 // linearly between them, so enough points are needed for the path to read as a
@@ -32,52 +32,75 @@ const centerOf = (rect) => ({
 const RECOIL_FRACTION = 0.18;
 
 /**
- * The routes, in a space where the button sits at (0, 0), the cart at (dx, dy),
- * and y grows downward — so the cart is usually at a negative y and "dipping
- * down" means a positive one.
- *
- * Each route is two phases. First the disc pulls back to `recoil`, away from
- * the cart, as a wind-up. Then it travels from there to the cart along a cubic
- * Bézier shaped by `controls`. Doing the recoil as its own phase, rather than
- * as a backward control point on one long curve, is what makes it actually
- * visible — a single Bézier absorbs the backward pull into the forward swing.
- *
- * `back` is the wind-up distance, `lift` the height of the swing, and `awayX`
- * points horizontally away from the cart.
+ * Reflects a point across the straight line from the button to the cart.
+ * Mirroring a low route this way produces its exact counterpart above the line,
+ * so an inverted route keeps the character of the one it came from.
+ * @param {{x: number, y: number}} point - The point to reflect.
+ * @param {number} dx - Horizontal distance to the cart.
+ * @param {number} dy - Vertical distance to the cart.
+ * @returns {{x: number, y: number}} The reflected point.
  */
-const ROUTES = {
-  // A short pull back, then a high sail over the page into the cart.
-  soarOver: {
-    recoil: (back, awayX) => ({ x: awayX * back * 0.55, y: back * 0.3 }),
-    controls: (dx, dy, lift) => [
-      { x: dx * 0.15, y: dy * 0.15 - lift },
-      { x: dx * 0.7, y: dy * 0.55 - lift * 0.6 },
-    ],
-  },
-  // The longest wind-up: well back and below, then one big sweep up.
-  hookBack: {
-    recoil: (back, awayX) => ({ x: awayX * back, y: back * 0.75 }),
-    controls: (dx, dy, lift) => [
-      { x: dx * 0.1, y: dy * 0.1 - lift * 0.4 },
-      { x: dx * 0.55, y: dy * 0.35 - lift },
-    ],
-  },
-  // Pulls back and drops, then runs low before climbing steeply at the cart.
-  dipUnder: {
+const mirrorAcrossPath = (point, dx, dy) => {
+  const lengthSquared = dx * dx + dy * dy;
+  if (lengthSquared === 0) return { ...point };
+
+  const projection = (point.x * dx + point.y * dy) / lengthSquared;
+
+  return {
+    x: 2 * projection * dx - point.x,
+    y: 2 * projection * dy - point.y,
+  };
+};
+
+/**
+ * The two shapes every route is built from, in a space where the button sits at
+ * (0, 0), the cart at (dx, dy), and y grows downward — so the cart is usually at
+ * a negative y and "dipping down" means a positive one.
+ *
+ * Both drop beneath the button and run low before climbing into the cart; they
+ * differ in how deep the dip is and how late the climb comes.
+ *
+ * A shape is two phases. First the disc pulls back to `recoil`, away from the
+ * cart, as a wind-up. Then it travels from there along a cubic Bézier shaped by
+ * `controls`. Doing the recoil as its own phase, rather than as a backward
+ * control point on one long curve, is what makes it visible at all — a single
+ * Bézier absorbs the backward pull into the forward swing.
+ *
+ * `back` is the wind-up distance and `awayX` points horizontally away from the
+ * cart.
+ */
+const BASE_SHAPES = {
+  // Drops deepest, then climbs steeply at the end.
+  dip: {
     recoil: (back, awayX) => ({ x: awayX * back * 0.45, y: back * 1.15 }),
-    controls: (dx, dy, lift, back) => [
+    controls: (dx, dy, back) => [
       { x: dx * 0.15, y: back * 1.4 },
       { x: dx * 1.05, y: dy * 0.12 },
     ],
   },
-  // Pulls back level, then races past the cart and curls back into it.
-  sweepPast: {
-    recoil: (back, awayX) => ({ x: awayX * back * 0.8, y: back * 0.15 }),
-    controls: (dx, dy, lift) => [
-      { x: dx * 0.45, y: dy * 0.1 - lift * 0.5 },
-      { x: dx * 1.3, y: dy * 0.8 - lift * 0.1 },
+  // A shallower dip held further across, with an even later climb.
+  dipHeld: {
+    recoil: (back, awayX) => ({ x: awayX * back * 0.5, y: back * 0.8 }),
+    controls: (dx, dy, back) => [
+      { x: dx * 0.4, y: back * 1.1 },
+      { x: dx * 1.14, y: dy * 0.04 },
     ],
   },
+};
+
+/**
+ * The routes. Two run below the line of travel; the other two are those same
+ * two reflected across it, so they arc above instead — the same motion turned
+ * upside down rather than a different idea.
+ *
+ * Only the flight is mirrored. The wind-up stays a pull back and down for every
+ * route, so the gesture that starts the animation always reads the same way.
+ */
+const ROUTES = {
+  dipUnder: { shape: BASE_SHAPES.dip },
+  dipLate: { shape: BASE_SHAPES.dipHeld },
+  archOver: { shape: BASE_SHAPES.dip, inverted: true },
+  archEarly: { shape: BASE_SHAPES.dipHeld, inverted: true },
 };
 
 /**
@@ -127,26 +150,28 @@ const cubicAt = (u, p0, p1, p2, p3) => {
  *
  * @param {{left: number, top: number, width: number, height: number}} originRect - The clicked button.
  * @param {{left: number, top: number, width: number, height: number}} targetRect - The cart button.
- * @param {string} [path='soarOver'] - Which route to trace; see FLIGHT_PATHS.
+ * @param {string} [path='dipUnder'] - Which route to trace; see FLIGHT_PATHS.
  * @returns {Object[]} Keyframes for Element.animate().
  */
-export const buildFlightKeyframes = (originRect, targetRect, path = 'soarOver') => {
+export const buildFlightKeyframes = (originRect, targetRect, path = 'dipUnder') => {
   const origin = centerOf(originRect);
   const target = centerOf(targetRect);
 
   const dx = target.x - origin.x;
   const dy = target.y - origin.y;
 
-  // Longer journeys swing wider and wind up further, but not without limit.
+  // Longer journeys wind up further, but not without limit.
   const distance = Math.hypot(dx, dy);
-  const lift = Math.min(240, 90 + distance * 0.18);
   const back = Math.min(130, 50 + distance * 0.07);
   // Away from the cart horizontally — the direction the wind-up travels.
   const awayX = -Math.sign(dx || 1);
 
-  const route = ROUTES[path] ?? ROUTES.soarOver;
-  const recoil = route.recoil(back, awayX);
-  const [c1, c2] = route.controls(dx, dy, lift, back);
+  const route = ROUTES[path] ?? ROUTES.dipUnder;
+  const recoil = route.shape.recoil(back, awayX);
+  const controls = route.shape.controls(dx, dy, back);
+  const [c1, c2] = route.inverted
+    ? controls.map((point) => mirrorAcrossPath(point, dx, dy))
+    : controls;
   const destination = { x: dx, y: dy };
 
   return Array.from({ length: SAMPLE_COUNT }, (_, index) => {

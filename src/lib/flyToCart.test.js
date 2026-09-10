@@ -96,35 +96,50 @@ describe('buildFlightKeyframes', () => {
     expect(scaleOf(frames.at(-1))).toBeLessThan(0.2);
   });
 
-  it('hookBack pulls back furthest of the four', () => {
-    const pullBackFor = (path) =>
-      -Math.min(...pointsOf(buildFlightKeyframes(BUTTON, CART, path)).map((p) => p.x));
+  // How far each sample sits off the straight line from button to cart.
+  // Positive is below that line, negative above it.
+  const deviationsFrom = (path) => {
+    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, path));
+    const dx = 960;
+    const dy = -584;
+    const lengthSquared = dx * dx + dy * dy;
 
-    const others = FLIGHT_PATHS.filter((p) => p !== 'hookBack').map(pullBackFor);
-    expect(pullBackFor('hookBack')).toBeGreaterThan(Math.max(...others));
+    return points.map((p) => p.y - ((p.x * dx + p.y * dy) / lengthSquared) * dy);
+  };
+
+  it.each(['dipUnder', 'dipLate'])('%s runs below the straight line', (path) => {
+    const deviations = deviationsFrom(path);
+    expect(Math.max(...deviations)).toBeGreaterThan(100);
+    expect(deviations[Math.floor(deviations.length / 2)]).toBeGreaterThan(0);
   });
 
-  it('dipUnder drops below the button before climbing', () => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, 'dipUnder'));
-
-    expect(Math.max(...points.map((p) => p.y))).toBeGreaterThan(40);
+  it.each(['archOver', 'archEarly'])('%s arcs above the straight line', (path) => {
+    const deviations = deviationsFrom(path);
+    expect(Math.min(...deviations)).toBeLessThan(-100);
+    expect(deviations[Math.floor(deviations.length / 2)]).toBeLessThan(0);
   });
 
-  it('sweepPast overshoots the cart before curling back', () => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, 'sweepPast'));
+  it('builds the arcing routes as reflections of the dipping ones', () => {
+    // archOver is dipUnder mirrored, so their swings away from the line should
+    // be comparable in size and opposite in sign.
+    const low = deviationsFrom('dipUnder');
+    const high = deviationsFrom('archOver');
 
-    expect(Math.max(...points.map((p) => p.x))).toBeGreaterThan(960);
+    expect(Math.max(...low)).toBeGreaterThan(0);
+    expect(Math.min(...high)).toBeLessThan(0);
+    // Equal magnitudes on opposite sides sum to roughly zero.
+    expect(Math.abs(Math.max(...low) + Math.min(...high))).toBeLessThan(40);
   });
 
   it('falls back to a known route when handed an unknown one', () => {
     const unknown = pointsOf(buildFlightKeyframes(BUTTON, CART, 'not-a-route'));
-    const fallback = pointsOf(buildFlightKeyframes(BUTTON, CART, 'soarOver'));
+    const fallback = pointsOf(buildFlightKeyframes(BUTTON, CART, 'dipUnder'));
 
     expect(unknown).toEqual(fallback);
   });
 
   it('handles an origin and target in the same place', () => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, BUTTON, 'soarOver'));
+    const points = pointsOf(buildFlightKeyframes(BUTTON, BUTTON, 'dipUnder'));
     expect(points.at(-1)).toEqual({ x: 0, y: 0 });
   });
 });
