@@ -1,30 +1,32 @@
 import { useParams } from 'react-router-dom';
-import { products } from '../data/products';
+import { getCollection, getProductsByCollection } from '../lib/catalog';
 import CollectionGrid from '../components/Collection/CollectionGrid';
-
 import SEO from '../components/UI/SEO';
+import NotFound from './NotFound';
 
 /**
  * CollectionPage Component
- * Displays a list of products belonging to a specific collection.
+ * Lists the products in a collection.
  */
 function CollectionPage() {
   const { handle } = useParams();
+  const collection = getCollection(handle);
 
-  // Filter products based on the handle
-  const filteredProducts = handle === 'all' 
-    ? products 
-    : products.filter(p => p.collection.toLowerCase() === handle.toLowerCase());
+  // An unrecognised handle used to render an empty, indexable page titled after
+  // whatever the URL happened to contain.
+  if (!collection) {
+    return <NotFound title="Collection not found" />;
+  }
 
-  const collectionTitle = handle.charAt(0).toUpperCase() + handle.slice(1);
+  const products = getProductsByCollection(collection.handle);
 
   return (
     <div className="container mx-auto px-6">
-      <SEO 
-        title={`${collectionTitle} Collection`}
-        description={`Explore our ${handle} collection at Minimalist Essentials. Curated minimalist products.`}
+      <SEO
+        title={`${collection.title} Collection`}
+        description={`Explore our ${collection.title.toLowerCase()} collection. Curated minimalist products.`}
       />
-      <CollectionGrid products={filteredProducts} collection={handle} />
+      <CollectionGrid products={products} title={collection.title} />
     </div>
   );
 }
