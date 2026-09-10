@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BsCartCheck, BsList } from "react-icons/bs";
 import { useCart } from "../context/CartContext";
+import { useFlyToCart } from "../context/FlyToCartContext";
 import { COLLECTIONS } from "../lib/catalog";
 import { SITE } from "../lib/site";
 import MobileMenu from "./MobileMenu";
@@ -16,6 +17,7 @@ const navLinkClasses = ({ isActive }) =>
  */
 function Header() {
     const { toggleCart, cartCount } = useCart();
+    const { registerCartTarget } = useFlyToCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
@@ -57,10 +59,16 @@ function Header() {
                 <GlobalSearch />
 
                 <button
+                    // Destination for the add-to-cart flight.
+                    ref={registerCartTarget}
                     type="button"
                     onClick={toggleCart}
                     className="p-3 hover:bg-gray-100 rounded-full transition-colors relative"
-                    aria-label={cartCount > 0 ? `Open cart, ${cartCount} items` : 'Open cart'}
+                    aria-label={
+                        cartCount > 0
+                            ? `Open cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`
+                            : 'Open cart'
+                    }
                     aria-haspopup="dialog"
                 >
                     <BsCartCheck size={24} />

@@ -11,18 +11,21 @@ import AppRoutes from './routes.jsx'
 import ErrorBoundary from './components/UI/ErrorBoundary.jsx'
 import ScrollToTop from './components/UI/ScrollToTop.jsx'
 import { CartProvider } from './context/CartProvider.jsx'
+import { FlyToCartProvider } from './context/FlyToCartProvider.jsx'
 import { ModalProvider } from './context/ModalProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
       <CartProvider>
-        <ModalProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <AppRoutes />
-          </BrowserRouter>
-        </ModalProvider>
+        <FlyToCartProvider>
+          <ModalProvider>
+            <BrowserRouter>
+              <ScrollToTop />
+              <AppRoutes />
+            </BrowserRouter>
+          </ModalProvider>
+        </FlyToCartProvider>
       </CartProvider>
     </ErrorBoundary>
   </StrictMode>,
