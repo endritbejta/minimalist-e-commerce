@@ -1,33 +1,43 @@
-import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
+import { SITE, toAbsoluteUrl } from '../../lib/site';
 
 /**
  * SEO Component
- * Dynamically injects meta tags into the document head for search engine optimization and social sharing.
+ * Declares the document metadata for a page.
+ *
+ * React 19 hoists `<title>`, `<meta>` and `<link>` into the document head on
+ * its own, so this needs no third-party helmet library or provider.
+ *
  * @param {Object} props - Component props.
- * @param {string} props.title - The title of the page.
- * @param {string} props.description - A short summary of the page content.
+ * @param {string} [props.title] - Page title, prefixed to the site name.
+ * @param {string} [props.description] - Short summary of the page.
  * @param {string} [props.keywords] - Comma-separated SEO keywords.
- * @param {string} [props.image] - URL for the Open Graph image.
- * @param {string} [props.url] - Canonical URL for the page.
+ * @param {string} [props.image] - Open Graph image; relative paths are made absolute.
  * @param {string} [props.type='website'] - Open Graph content type.
+ * @param {boolean} [props.noindex=false] - Ask crawlers to skip this page.
  */
-const SEO = ({ 
-  title, 
-  description, 
-  keywords, 
-  image = '/og-image.jpg', 
-  url = window.location.href, 
-  type = 'website' 
+const SEO = ({
+  title,
+  description = SITE.description,
+  keywords,
+  image = SITE.defaultImage,
+  type = 'website',
+  noindex = false,
 }) => {
-  const siteName = 'Minimalist Essentials';
-  const fullTitle = title ? `${title} | ${siteName}` : siteName;
+  const { pathname } = useLocation();
+
+  // Canonicals come from the route, not window.location, so query strings and
+  // hashes cannot fragment a page into several canonical URLs.
+  const url = toAbsoluteUrl(pathname);
+  const absoluteImage = toAbsoluteUrl(image);
+  const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
 
   return (
-    <Helmet>
-      {/* Standard metadata tags */}
+    <>
       <title>{fullTitle}</title>
-      <meta name='description' content={description} />
-      {keywords && <meta name='keywords' content={keywords} />}
+      <meta name="description" content={description} />
+      {keywords && <meta name="keywords" content={keywords} />}
+      {noindex && <meta name="robots" content="noindex, follow" />}
       <link rel="canonical" href={url} />
 
       {/* Open Graph / Facebook */}
@@ -35,16 +45,15 @@ const SEO = ({
       <meta property="og:url" content={url} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-      <meta property="og:site_name" content={siteName} />
+      <meta property="og:site_name" content={SITE.name} />
+      {absoluteImage && <meta property="og:image" content={absoluteImage} />}
 
       {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={url} />
+      <meta name="twitter:card" content={absoluteImage ? 'summary_large_image' : 'summary'} />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-    </Helmet>
+      {absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+    </>
   );
 };
 

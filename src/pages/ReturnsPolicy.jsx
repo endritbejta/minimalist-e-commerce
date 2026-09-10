@@ -1,4 +1,5 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
+import SEO from '../components/UI/SEO';
 
 /**
  * ReturnsPolicy Component
@@ -7,9 +8,10 @@ import Breadcrumbs from '../components/UI/Breadcrumbs';
 function ReturnsPolicy() {
   return (
     <div className="container mx-auto px-6 py-12 max-w-3xl">
+      <SEO title="Returns &amp; Exchanges" description="Our 30-day return policy and how to start an exchange." />
       <Breadcrumbs />
       <h1 className="text-4xl font-bold mb-8">Returns & Exchanges</h1>
-      <div className="prose prose-gray max-w-none space-y-6 text-gray-600">
+      <div className="max-w-none space-y-6 text-gray-600">
         <section>
           <h2 className="text-xl font-bold text-black mb-3">30-Day Returns</h2>
           <p>We want you to love your purchase. If you're not entirely satisfied, you can return your items within 30 days of delivery for a full refund or exchange.</p>

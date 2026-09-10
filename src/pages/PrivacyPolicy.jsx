@@ -1,3 +1,6 @@
+import Breadcrumbs from '../components/UI/Breadcrumbs';
+import SEO from '../components/UI/SEO';
+
 /**
  * PrivacyPolicy Component
  * Displays the site's privacy policy and data collection practices.
@@ -5,9 +8,11 @@
 function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">
+      <SEO title="Privacy Policy" description="How we collect, use and protect your personal information." />
+      <Breadcrumbs />
       <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight">Privacy Policy</h1>
       
-      <div className="prose prose-lg text-gray-600 space-y-8 max-w-none">
+      <div className="text-gray-600 space-y-8 max-w-none">
         <section>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Introduction</h2>
           <p>

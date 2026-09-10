@@ -1,3 +1,6 @@
+import Breadcrumbs from '../components/UI/Breadcrumbs';
+import SEO from '../components/UI/SEO';
+
 /**
  * TermsOfService Component
  * Displays the legal terms and conditions for using the website.
@@ -5,9 +8,11 @@
 function TermsOfService() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">
+      <SEO title="Terms of Service" description="The terms and conditions for using this website." />
+      <Breadcrumbs />
       <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 tracking-tight">Terms of Service</h1>
       
-      <div className="prose prose-lg text-gray-600 space-y-8 max-w-none">
+      <div className="text-gray-600 space-y-8 max-w-none">
         <section>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Terms</h2>
           <p>

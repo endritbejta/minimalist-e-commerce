@@ -1,4 +1,5 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
+import SEO from '../components/UI/SEO';
 
 /**
  * ShippingPolicy Component
@@ -7,9 +8,10 @@ import Breadcrumbs from '../components/UI/Breadcrumbs';
 function ShippingPolicy() {
   return (
     <div className="container mx-auto px-6 py-12 max-w-3xl">
+      <SEO title="Shipping Policy" description="Order processing times, shipping rates and delivery estimates." />
       <Breadcrumbs />
       <h1 className="text-4xl font-bold mb-8">Shipping Policy</h1>
-      <div className="prose prose-gray max-w-none space-y-6 text-gray-600">
+      <div className="max-w-none space-y-6 text-gray-600">
         <section>
           <h2 className="text-xl font-bold text-black mb-3">Order Processing</h2>
           <p>All orders are processed within 1–2 business days. Orders are not shipped or delivered on weekends or holidays.</p>
