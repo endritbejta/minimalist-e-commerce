@@ -1,57 +1,102 @@
-# Minimalist Essentials - Premium E-Commerce Platform
+# Minimalist Essentials — Premium E-Commerce
 
-A sophisticated, high-performance minimalist e-commerce application built with **React 19** and **Vite**. This project prioritizes visual excellence, smooth interactions, and a premium user experience.
+A minimalist e-commerce storefront built with **React 19**, **Vite** and **Tailwind CSS**.
+Client-side only: the catalog is static data and the cart lives in `localStorage`.
 
 🔗 **[Live Demo](https://endrits-e-commerce.netlify.app/)**
 
 ---
 
-## ✨ Key Features
+## Getting Started
 
-- **Premium Aesthetics**: A stunning UI designed with a minimalist philosophy, featuring vibrant color palettes, sleek typography, and glassmorphism.
-- **Dynamic Product Customization**: Innovative product customizer allowing users to modify items (like adding emblems to T-shirts) with real-time visual feedback.
-- **Advanced SEO System**: Integrated `react-helmet-async` for dynamic meta tags, unique titles for every page, and full Open Graph/Twitter Card support for social sharing.
-- **High Performance**: Optimized using Vite and React 19 features like the React Compiler for lightning-fast interactions and page loads.
-- **Responsive & Modern**: Fully responsive layout built with Tailwind CSS, ensuring a premium experience on desktop, tablet, and mobile.
-- **Intuitive UX**: Includes features like a slide-out cart drawer, smooth scroll-to-top, and animated breadcrumbs for easy navigation.
+```bash
+npm install
+npm run dev
+```
+
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build (regenerates `public/sitemap.xml` first) |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint, including the React Compiler rules |
+| `npm test` | Vitest unit tests |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Framework**: [React 19](https://react.dev/) with the React Compiler
+- **Build**: [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Routing**: [React Router 7](https://reactrouter.com/)
-- **SEO**: [React Helmet Async](https://github.com/staylor/react-helmet-async)
 - **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
+- **Tests**: [Vitest](https://vitest.dev/)
+
+Document metadata uses React 19's built-in `<title>`/`<meta>` hoisting, so there is no
+helmet library. `index.html` deliberately declares neither, to avoid duplicate tags.
 
 ---
 
-## 🚀 Getting Started
+## Architecture
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/endritbejta/minimalist-e-commerce.git
-   ```
+```
+src/
+├─ lib/          Framework-free logic — catalog lookups, cart line identity,
+│                price formatting, emblem geometry, site constants
+├─ context/      Each context is split in two: `XContext.js` holds the context
+│                object and its hook, `XProvider.jsx` holds the component.
+│                Keeps React Fast Refresh working.
+├─ hooks/        useScrollLock, useDialog, usePersistedReducer, and friends
+├─ components/   UI, grouped by feature (Cart, Collection, Home, Product, UI)
+├─ Layout/       Header, Footer, MainLayout, CartDrawer, MobileMenu
+├─ pages/        Route components (all code-split)
+└─ data/         Static product catalog
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+A few conventions worth knowing:
 
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
+- **Nothing imports `data/products` to look something up.** `lib/catalog.js` owns
+  lookups, the collection registry and the nav list, so a new collection in the
+  data is automatically reachable and an unknown URL 404s properly.
+- **Prices only ever render through `formatPrice`.**
+- **A cart line is identified by variant *and* customization**, not by product id
+  — see `lib/cart.js`. Two colours of the same shirt are two lines.
+- **Overlays share `useScrollLock` and `useDialog`.** The scroll lock is
+  reference-counted so overlapping overlays cannot unlock the page early, and
+  closed overlays are marked `inert` so they leave the tab order.
+- **Design tokens live in `tailwind.config.js`** — including a named z-index
+  scale (`z-header`, `z-modal`, `z-cart`…) rather than ad-hoc values.
 
-4. **Build for production**:
-   ```bash
-   npm run build
-   ```
+## Accessibility
+
+- Every dialog traps focus, closes on Escape, and returns focus to its trigger.
+- Animated headings expose their text via `aria-label`; the per-character spans
+  are hidden from assistive technology.
+- `prefers-reduced-motion` is honoured globally in `index.css`.
+- The design is light-only and declares `color-scheme: light`.
+
+## Testing
+
+Unit tests cover the parts where a mistake is expensive — cart line identity,
+reducer transitions, persistence and rehydration of untrusted `localStorage`
+data, catalog lookups and price formatting.
+
+```bash
+npm test
+```
+
+## Known Limitations
+
+This is a portfolio demo, not a shop:
+
+- No backend — checkout is disabled, and the contact/newsletter forms only
+  confirm locally.
+- Product photography is placeholder imagery from Unsplash. The t-shirt colour
+  variants all share one photo, so the swatches change the selection but not the
+  picture.
+- Customization is captured and priced at the base rate; there is no upcharge.
 
 ---
 
-## 📄 License
-
-This project is open-source and available for everyone. Curated with care by **Endrit Bejta**.
+Curated with care by **Endrit Bejta**.

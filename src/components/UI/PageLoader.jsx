@@ -1,23 +1,31 @@
+import { SITE } from '../../lib/site';
+
 /**
  * PageLoader Component
- * A full-screen loader displayed during initial page load or route transitions.
+ * Loading indicator for code-split routes.
+ * @param {Object} props - Component props.
+ * @param {boolean} [props.fullScreen=false] - Cover the viewport instead of sitting in the content area.
  */
-function PageLoader() {
+function PageLoader({ fullScreen = false }) {
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-[9999]">
-      <div className="w-64 h-[1px] bg-gray-100 relative overflow-hidden mb-4">
-        {/* The Filling Line */}
-        <div className="absolute inset-0 bg-black animate-loading-bar origin-left"></div>
+    <div
+      role="status"
+      aria-live="polite"
+      className={
+        fullScreen
+          ? 'fixed inset-0 flex flex-col items-center justify-center bg-white z-loader'
+          : 'min-h-[60vh] flex flex-col items-center justify-center'
+      }
+    >
+      <div className="w-64 max-w-[60vw] h-[1px] bg-gray-100 relative overflow-hidden mb-4">
+        <div className="absolute inset-0 bg-black animate-loading-bar origin-left" />
       </div>
-      
-      {/* Branding / Text */}
+
       <div className="flex flex-col items-center space-y-1">
         <span className="text-[10px] uppercase tracking-[0.4em] font-black text-gray-900">
-          E-Commerce
+          {SITE.shortName}
         </span>
-        <span className="text-[8px] uppercase tracking-[0.2em] text-gray-500 font-bold">
-          Loading Experiences
-        </span>
+        <span className="sr-only">Loading</span>
       </div>
     </div>
   );

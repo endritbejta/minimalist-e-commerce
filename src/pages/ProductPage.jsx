@@ -1,60 +1,59 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { products } from '../data/products';
+import { CustomizationProvider } from '../context/CustomizationProvider';
+import { getProductByHandle } from '../lib/catalog';
 import Breadcrumbs from '../components/UI/Breadcrumbs';
-import ProductPageMedia from '../components/Product/ProductPageMedia';
 import ProductPageInformation from '../components/Product/ProductPageInformation';
-import { CustomizationProvider } from '../context/CustomizationContext';
+import ProductPageMedia from '../components/Product/ProductPageMedia';
 import SEO from '../components/UI/SEO';
+import NotFound from './NotFound';
 
 /**
  * ProductPage Component
- * The main container for individual product details.
- * Handles product lookup by handle and sets up the customization context.
+ * Resolves a product from the route and renders its detail view.
  */
 function ProductPage() {
   const { productHandle } = useParams();
-  
-  // Find the product by handle
-  const product = products.find((p) => p.handle === productHandle);
+  const product = getProductByHandle(productHandle);
 
+  // Reuse the real 404 page (which also sends `noindex`) rather than showing a
+  // bare "not found" line that search engines would happily index.
   if (!product) {
-    return (
-      <div className="container mx-auto p-20 text-center">
-        <h1 className="text-2xl font-bold">Product not found</h1>
-      </div>
-    );
+    return <NotFound title="Product not found" />;
   }
 
   return (
     <CustomizationProvider>
+      {/* key resets variant and customization state when the product changes */}
       <ProductPageContent key={product.id} product={product} />
     </CustomizationProvider>
   );
 }
 
 function ProductPageContent({ product }) {
-  const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0] || null);
+  const [selectedVariant, setSelectedVariant] = useState(
+    () => product.variants?.[0] ?? null
+  );
 
-  // Note: key={product.id} on this component handles state reset when product changes
+  const images = selectedVariant?.image ? [selectedVariant.image] : product.images ?? [];
+  const mediaTitle = selectedVariant
+    ? `${product.title} - ${selectedVariant.title}`
+    : product.title;
 
   return (
     <div className="container mx-auto p-6">
-      <SEO 
+      <SEO
         title={product.title}
-        description={product.description || `Buy ${product.title} at Minimalist Essentials. High-quality minimalist design.`}
-        image={product.image}
+        description={product.description}
+        image={images[0]}
         type="product"
       />
-      <Breadcrumbs />
-      
+      <Breadcrumbs currentLabel={product.title} />
+
       <div className="flex flex-col md:flex-row gap-12 mt-8">
-        <ProductPageMedia 
-          images={selectedVariant ? [selectedVariant.image] : (product.images || [product.image])} 
-          title={selectedVariant ? `${product.title} - ${selectedVariant.title}` : product.title} 
-        />
-        <ProductPageInformation 
-          product={product} 
+        <ProductPageMedia images={images} title={mediaTitle} />
+        <ProductPageInformation
+          product={product}
           selectedVariant={selectedVariant}
           setSelectedVariant={setSelectedVariant}
         />

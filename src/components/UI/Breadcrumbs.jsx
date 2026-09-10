@@ -1,40 +1,41 @@
 import { Link, useLocation } from "react-router-dom";
+import { humanizeSlug } from "../../lib/format";
 
 /**
  * Breadcrumbs Component
- * Displays a navigation trail based on the current URL path.
- * @param {string} className - Additional CSS classes for the nav element.
- * @param {Object} props - Additional props spread onto the nav element.
+ * Navigation trail derived from the current URL.
+ * @param {Object} props - Component props.
+ * @param {string} [props.currentLabel] - Overrides the last crumb, so a product
+ *   page can show its real title instead of its URL handle.
+ * @param {string} [props.className] - Additional CSS classes for the nav element.
  */
-function Breadcrumbs({ className = "", ...props }) {
-  const location = useLocation();
-  
-  // Split path into segments and filter out empty strings
-  const pathnames = location.pathname.split('/').filter((x) => x);
+function Breadcrumbs({ currentLabel, className = "", ...props }) {
+  const { pathname } = useLocation();
+  const segments = pathname.split('/').filter(Boolean);
 
   return (
-    <nav className={`flex text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mb-2 lg:mb-4 ${className}`} aria-label="Breadcrumb" {...props}>
+    <nav
+      aria-label="Breadcrumb"
+      className={`flex text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest mb-2 lg:mb-4 ${className}`}
+      {...props}
+    >
       <ol className="flex items-center space-x-1 lg:space-x-2">
         <li>
           <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
         </li>
-        
-        {pathnames.map((value, index) => {
-          const last = index === pathnames.length - 1;
-          const to = `/${pathnames.slice(0, index + 1).join('/')}`;
 
-          // Format label: capitalize and replace dashes with spaces
-          const label = value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, ' ');
+        {segments.map((segment, index) => {
+          const isLast = index === segments.length - 1;
+          const to = `/${segments.slice(0, index + 1).join('/')}`;
+          const label = isLast && currentLabel ? currentLabel : humanizeSlug(segment);
 
           return (
             <li key={to} className="flex items-center space-x-2">
-              <span>/</span>
-              {last ? (
-                <span className="text-gray-900 font-medium">{label}</span>
+              <span aria-hidden="true">/</span>
+              {isLast ? (
+                <span className="text-gray-900 font-medium" aria-current="page">{label}</span>
               ) : (
-                <Link to={to} className="hover:text-gray-900 transition-colors">
-                  {label}
-                </Link>
+                <Link to={to} className="hover:text-gray-900 transition-colors">{label}</Link>
               )}
             </li>
           );

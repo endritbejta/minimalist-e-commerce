@@ -12,6 +12,7 @@ function CartEmptyState({ onClose }) {
             <BsCartCheck size={48} className="opacity-20" />
             <p className="font-medium">Your bag is empty</p>
             <button
+                type="button"
                 onClick={onClose}
                 className="text-black font-bold underline underline-offset-4 hover:text-gray-600 transition-colors"
             >
