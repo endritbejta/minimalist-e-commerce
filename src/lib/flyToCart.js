@@ -6,8 +6,12 @@
  * list ready for Element.animate().
  */
 
-export const FLY_DURATION_MS = 900;
+export const FLY_DURATION_MS = 1000;
 export const FLY_SIZE_PX = 64;
+// A 64px disc is a sixth of a 375px screen, which reads as a lump rather than a
+// product. Phones get a smaller one.
+export const FLY_SIZE_COMPACT_PX = 44;
+const COMPACT_VIEWPORT_PX = 640;
 export const FLY_EASING = 'cubic-bezier(0.33, 0, 0.2, 1)';
 
 /**
@@ -109,6 +113,14 @@ const ROUTES = {
  */
 export const pickFlightPath = () =>
   FLIGHT_PATHS[Math.floor(Math.random() * FLIGHT_PATHS.length)];
+
+/**
+ * The disc diameter for a given viewport width.
+ * @param {number} viewportWidth - Width of the window, in CSS pixels.
+ * @returns {number} The diameter to use.
+ */
+export const getFlightSize = (viewportWidth) =>
+  viewportWidth < COMPACT_VIEWPORT_PX ? FLY_SIZE_COMPACT_PX : FLY_SIZE_PX;
 
 /**
  * Fixed-position placement for the flying element, centred over its origin.

@@ -5,6 +5,7 @@ import {
   FLY_EASING,
   buildCartBumpKeyframes,
   buildFlightKeyframes,
+  getFlightSize,
   getFlightStyle,
   pickFlightPath,
 } from '../lib/flyToCart';
@@ -52,7 +53,7 @@ function FlyingItem({ flight, onLanded }) {
       ref={elementRef}
       aria-hidden="true"
       className="pointer-events-none z-flyer overflow-hidden rounded-full bg-white shadow-2xl ring-1 ring-black/10"
-      style={getFlightStyle(flight.originRect)}
+      style={getFlightStyle(flight.originRect, flight.size)}
     >
       <img src={flight.image} alt="" className="h-full w-full object-cover" />
     </div>
@@ -121,10 +122,18 @@ export const FlyToCartProvider = ({ children }) => {
         window.setTimeout(() => handleLanded(id), FLY_DURATION_MS + 250)
       );
 
-      // Chosen once, here, so a re-render cannot swap the route mid-flight.
+      // Route and size are settled here, once, so neither a re-render nor a
+      // window resize can change them mid-flight.
       setFlights((current) => [
         ...current,
-        { id, image, originRect, targetRect, path: pickFlightPath() },
+        {
+          id,
+          image,
+          originRect,
+          targetRect,
+          path: pickFlightPath(),
+          size: getFlightSize(window.innerWidth),
+        },
       ]);
     });
   }, [handleLanded]);

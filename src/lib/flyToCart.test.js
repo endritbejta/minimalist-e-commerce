@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   FLIGHT_PATHS,
+  FLY_SIZE_COMPACT_PX,
   FLY_SIZE_PX,
   buildFlightKeyframes,
+  getFlightSize,
   getFlightStyle,
   pickFlightPath,
 } from './flyToCart';
@@ -21,6 +23,20 @@ const pointsOf = (frames) =>
 
 const scaleOf = (frame) => Number(frame.transform.match(/scale\(([\d.]+)\)/)[1]);
 
+describe('getFlightSize', () => {
+  it('uses a smaller disc on phone-width screens', () => {
+    expect(getFlightSize(375)).toBe(FLY_SIZE_COMPACT_PX);
+    expect(getFlightSize(639)).toBe(FLY_SIZE_COMPACT_PX);
+    expect(getFlightSize(640)).toBe(FLY_SIZE_PX);
+    expect(getFlightSize(1440)).toBe(FLY_SIZE_PX);
+  });
+
+  it('keeps the compact disc a sensible fraction of a small screen', () => {
+    // A disc wider than about a fifth of the screen reads as a lump.
+    expect(FLY_SIZE_COMPACT_PX / 375).toBeLessThan(0.2);
+  });
+});
+
 describe('getFlightStyle', () => {
   it('centres the disc over the button it left from', () => {
     const style = getFlightStyle(BUTTON);
@@ -29,6 +45,14 @@ describe('getFlightStyle', () => {
     expect(style.left).toBe(`${260 - FLY_SIZE_PX / 2}px`);
     expect(style.top).toBe(`${624 - FLY_SIZE_PX / 2}px`);
     expect(style.position).toBe('fixed');
+  });
+
+  it('stays centred at the compact size too', () => {
+    const style = getFlightStyle(BUTTON, FLY_SIZE_COMPACT_PX);
+
+    expect(style.left).toBe(`${260 - FLY_SIZE_COMPACT_PX / 2}px`);
+    expect(style.top).toBe(`${624 - FLY_SIZE_COMPACT_PX / 2}px`);
+    expect(style.width).toBe(`${FLY_SIZE_COMPACT_PX}px`);
   });
 });
 
