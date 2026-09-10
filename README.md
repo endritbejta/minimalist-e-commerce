@@ -62,6 +62,10 @@ A few conventions worth knowing:
 - **Prices only ever render through `formatPrice`.**
 - **A cart line is identified by variant *and* customization**, not by product id
   — see `lib/cart.js`. Two colours of the same shirt are two lines.
+- **Adding to the cart is animated by the compositor.** `FlyToCartProvider`
+  sends a disc of the product arcing from the button to the cart icon using the
+  Web Animations API, and the item is added when it lands. The geometry is a
+  pure function in `lib/flyToCart.js`.
 - **Overlays share `useScrollLock` and `useDialog`.** The scroll lock is
   reference-counted so overlapping overlays cannot unlock the page early, and
   closed overlays are marked `inert` so they leave the tab order.

@@ -17,6 +17,7 @@ export default {
         search: '120',
         'cart-backdrop': '130',
         cart: '140',
+        flyer: '150',
         loader: '200',
       },
       keyframes: {

@@ -112,6 +112,16 @@ describe('cart persistence', () => {
     expect(persistCart(state)).not.toHaveProperty('isOpen');
   });
 
+  it('leaves the drawer alone when an item is added', () => {
+    // Adding is confirmed by the flight and the count, not by taking over the
+    // screen — and a shopper adding several things should not have to dismiss
+    // a drawer between each one.
+    const opened = cartReducer(initialCartState, { type: 'OPEN_CART' });
+
+    expect(add(initialCartState, black).isOpen).toBe(false);
+    expect(add(opened, black).isOpen).toBe(true);
+  });
+
   it('always rehydrates with the drawer closed', () => {
     const restored = hydrateCart({ isOpen: true, items: [] }, initialCartState);
     expect(restored.isOpen).toBe(false);

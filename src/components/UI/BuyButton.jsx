@@ -1,4 +1,6 @@
 import { useCart } from "../../context/CartContext";
+import { useFlyToCart } from "../../context/FlyToCartContext";
+import { getPrimaryImage } from "../../lib/catalog";
 
 const BASE_STYLES =
   "transition-all transform active:scale-95 font-bold rounded-lg text-[10px] sm:text-s focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2";
@@ -13,7 +15,10 @@ const VARIANTS = {
 
 /**
  * BuyButton Component
- * Adds a product to the cart with style variants.
+ * Adds a product to the cart, sending a small image of it arcing to the cart
+ * icon on the way. The item is added when the disc lands, so the count changes
+ * at the moment the shopper sees it arrive. The drawer is left alone — the
+ * flight and the count are the confirmation.
  *
  * @param {Object} props - Component props.
  * @param {Object} props.product - Product object to add to cart.
@@ -21,7 +26,7 @@ const VARIANTS = {
  * @param {string} [props.className] - Extra CSS classes.
  * @param {import('react').ReactNode} props.children - Button label/content.
  * @param {"primary"|"secondary"|"outline"|"ghost"} [props.variant="primary"] - Button style variant.
- * @param {Function} [props.onClick] - Optional extra click handler, run after the add.
+ * @param {Function} [props.onClick] - Optional extra click handler, run on click.
  */
 function BuyButton({
   product,
@@ -33,17 +38,23 @@ function BuyButton({
   ...props
 }) {
   const { addToCart } = useCart();
+  const { flyToCart } = useFlyToCart();
 
-  const handleClick = (event) => {
+  const handleClick = async (event) => {
     // Cards wrap their content in links; adding to the cart must not navigate.
     event.preventDefault();
     event.stopPropagation();
 
-    if (product) {
-      addToCart(product, quantity);
-    }
-
     onClick?.(event);
+    if (!product) return;
+
+    // Measured now: `currentTarget` is cleared once the handler yields, and the
+    // button may well be gone by the time the flight ends.
+    const originRect = event.currentTarget.getBoundingClientRect();
+
+    await flyToCart({ image: getPrimaryImage(product), originRect });
+
+    addToCart(product, quantity);
   };
 
   return (
