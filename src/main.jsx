@@ -25,7 +25,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import MainLayout from './Layout/MainLayout.jsx'
 import { CartProvider } from './context/CartProvider.jsx'
-import { ModalProvider } from './context/ModalContext.jsx'
+import { ModalProvider } from './context/ModalProvider.jsx'
 import ScrollToTop from './components/UI/ScrollToTop.jsx'
 import PageLoader from './components/UI/PageLoader.jsx'
 
