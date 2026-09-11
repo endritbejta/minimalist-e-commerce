@@ -4,6 +4,8 @@ import {
   FLY_SIZE_COMPACT_PX,
   FLY_SIZE_PX,
   buildFlightKeyframes,
+  centerOf,
+  getFlightOrigin,
   getFlightSize,
   getFlightStyle,
   pickFlightPath,
@@ -14,6 +16,10 @@ const rect = (left, top, width = 100, height = 40) => ({ left, top, width, heigh
 // A button low on the page, and a cart icon up in the header.
 const BUTTON = rect(200, 600, 120, 48);
 const CART = rect(1200, 20, 40, 40);
+
+// Both ends of a flight are points; these are the centres of the two above.
+const FROM = { x: 260, y: 624 };
+const TO = { x: 1220, y: 40 };
 
 const pointsOf = (frames) =>
   frames.map((frame) => {
@@ -44,9 +50,30 @@ describe('getFlightSize', () => {
   });
 });
 
+describe('centerOf', () => {
+  it('finds the middle of a rectangle', () => {
+    expect(centerOf(BUTTON)).toEqual(FROM);
+    expect(centerOf(CART)).toEqual(TO);
+  });
+});
+
+describe('getFlightOrigin', () => {
+  it('launches from the pointer when there is one', () => {
+    // Clicking the left edge of a wide button should start the disc there,
+    // not throw it to the middle of the button first.
+    const leftEdge = { x: 205, y: 620 };
+    expect(getFlightOrigin(BUTTON, leftEdge)).toEqual(leftEdge);
+  });
+
+  it('falls back to the centre for a keyboard activation', () => {
+    // Enter and Space report no coordinates, so there is no pointer to use.
+    expect(getFlightOrigin(BUTTON, undefined)).toEqual(FROM);
+  });
+});
+
 describe('getFlightStyle', () => {
   it('centres the disc over the button it left from', () => {
-    const style = getFlightStyle(BUTTON);
+    const style = getFlightStyle(FROM);
 
     // Button centre is (260, 624); a 64px disc starts 32px up and to the left.
     expect(style.left).toBe(`${260 - FLY_SIZE_PX / 2}px`);
@@ -55,7 +82,7 @@ describe('getFlightStyle', () => {
   });
 
   it('stays centred at the compact size too', () => {
-    const style = getFlightStyle(BUTTON, FLY_SIZE_COMPACT_PX);
+    const style = getFlightStyle(FROM, FLY_SIZE_COMPACT_PX);
 
     expect(style.left).toBe(`${260 - FLY_SIZE_COMPACT_PX / 2}px`);
     expect(style.top).toBe(`${624 - FLY_SIZE_COMPACT_PX / 2}px`);
@@ -65,7 +92,7 @@ describe('getFlightStyle', () => {
 
 describe('buildFlightKeyframes', () => {
   it.each(FLIGHT_PATHS)('%s starts at rest and lands on the cart centre', (path) => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, path));
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
 
     expect(points.at(0)).toEqual({ x: 0, y: 0 });
     // Button centre (260, 624) -> cart centre (1220, 40).
@@ -74,7 +101,7 @@ describe('buildFlightKeyframes', () => {
   });
 
   it.each(FLIGHT_PATHS)('%s shrinks steadily once it is under way', (path) => {
-    const frames = buildFlightKeyframes(BUTTON, CART, path);
+    const frames = buildFlightKeyframes(FROM, TO, path);
     const inFlight = frames.slice(Math.ceil(frames.length * 0.2));
 
     expect(scaleOf(frames.at(0))).toBe(1);
@@ -84,7 +111,7 @@ describe('buildFlightKeyframes', () => {
   });
 
   it.each(FLIGHT_PATHS)('%s stays fully opaque until it is nearly there', (path) => {
-    const frames = buildFlightKeyframes(BUTTON, CART, path);
+    const frames = buildFlightKeyframes(FROM, TO, path);
     const midway = frames[Math.floor(frames.length / 2)];
 
     expect(midway.opacity).toBe(1);
@@ -95,7 +122,7 @@ describe('buildFlightKeyframes', () => {
     // Compare the midpoint of each route; if two coincide they would look the
     // same in flight.
     const midpoints = FLIGHT_PATHS.map((path) => {
-      const points = pointsOf(buildFlightKeyframes(BUTTON, CART, path));
+      const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
       return points[Math.floor(points.length / 2)];
     });
 
@@ -107,7 +134,7 @@ describe('buildFlightKeyframes', () => {
   });
 
   it.each(FLIGHT_PATHS)('%s winds up away from the cart before setting off', (path) => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, path));
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
 
     // The cart is up and to the right, so a wind-up travels left and the disc
     // must be measurably behind where it started before it heads off.
@@ -120,7 +147,7 @@ describe('buildFlightKeyframes', () => {
   });
 
   it.each(FLIGHT_PATHS)('%s swells slightly during the wind-up, then shrinks', (path) => {
-    const frames = buildFlightKeyframes(BUTTON, CART, path);
+    const frames = buildFlightKeyframes(FROM, TO, path);
     const peak = Math.max(...frames.map(scaleOf));
 
     expect(peak).toBeGreaterThan(1);
@@ -130,7 +157,7 @@ describe('buildFlightKeyframes', () => {
   // How far each sample sits off the straight line from button to cart.
   // Positive is below that line, negative above it.
   const deviationsFrom = (path) => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, CART, path));
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
     const dx = 960;
     const dy = -584;
     const lengthSquared = dx * dx + dy * dy;
@@ -163,14 +190,14 @@ describe('buildFlightKeyframes', () => {
   });
 
   it('falls back to a known route when handed an unknown one', () => {
-    const unknown = pointsOf(buildFlightKeyframes(BUTTON, CART, 'not-a-route'));
-    const fallback = pointsOf(buildFlightKeyframes(BUTTON, CART, 'dipUnder'));
+    const unknown = pointsOf(buildFlightKeyframes(FROM, TO, 'not-a-route'));
+    const fallback = pointsOf(buildFlightKeyframes(FROM, TO, 'dipUnder'));
 
     expect(unknown).toEqual(fallback);
   });
 
   it('handles an origin and target in the same place', () => {
-    const points = pointsOf(buildFlightKeyframes(BUTTON, BUTTON, 'dipUnder'));
+    const points = pointsOf(buildFlightKeyframes(FROM, FROM, 'dipUnder'));
     expect(points.at(-1)).toEqual({ x: 0, y: 0 });
   });
 });

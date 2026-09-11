@@ -29,10 +29,28 @@ export const FLIGHT_PATHS = ['dipUnder', 'dipLate', 'archOver', 'archEarly'];
 // curve rather than a series of straight segments.
 const SAMPLE_COUNT = 30;
 
-const centerOf = (rect) => ({
+/**
+ * The middle of a rectangle.
+ * @param {{left: number, top: number, width: number, height: number}} rect - Any rectangle.
+ * @returns {{x: number, y: number}} Its centre point.
+ */
+export const centerOf = (rect) => ({
   x: rect.left + rect.width / 2,
   y: rect.top + rect.height / 2,
 });
+
+/**
+ * Where a flight should start.
+ *
+ * The pointer wins when there is one, so the disc appears under the finger or
+ * cursor rather than jumping to the middle of a wide button. A keyboard
+ * activation has no coordinates, and falls back to the button's centre.
+ *
+ * @param {{left: number, top: number, width: number, height: number}} originRect - The activated control.
+ * @param {{x: number, y: number}} [pointer] - Where the click landed, if it came from a pointer.
+ * @returns {{x: number, y: number}} The point the disc launches from.
+ */
+export const getFlightOrigin = (originRect, pointer) => pointer ?? centerOf(originRect);
 
 /**
  * How much of the flight is spent winding up before the disc sets off.
@@ -128,13 +146,11 @@ export const getFlightSize = (viewportWidth) =>
 
 /**
  * Fixed-position placement for the flying element, centred over its origin.
- * @param {{left: number, top: number, width: number, height: number}} originRect - The clicked button.
+ * @param {{x: number, y: number}} origin - Where the disc launches from.
  * @param {number} [size=FLY_SIZE_PX] - Diameter of the flying disc.
  * @returns {Object} Inline style positioning the element before it animates.
  */
-export const getFlightStyle = (originRect, size = FLY_SIZE_PX) => {
-  const origin = centerOf(originRect);
-
+export const getFlightStyle = (origin, size = FLY_SIZE_PX) => {
   return {
     position: 'fixed',
     left: `${origin.x - size / 2}px`,
@@ -164,15 +180,12 @@ const cubicAt = (u, p0, p1, p2, p3) => {
  * The disc shrinks as it travels and fades only at the very end, so it reads as
  * being drawn into the cart rather than dissolving on the way.
  *
- * @param {{left: number, top: number, width: number, height: number}} originRect - The clicked button.
- * @param {{left: number, top: number, width: number, height: number}} targetRect - The cart button.
+ * @param {{x: number, y: number}} origin - Where the disc launches from.
+ * @param {{x: number, y: number}} target - The centre of the cart control.
  * @param {string} [path='dipUnder'] - Which route to trace; see FLIGHT_PATHS.
  * @returns {Object[]} Keyframes for Element.animate().
  */
-export const buildFlightKeyframes = (originRect, targetRect, path = 'dipUnder') => {
-  const origin = centerOf(originRect);
-  const target = centerOf(targetRect);
-
+export const buildFlightKeyframes = (origin, target, path = 'dipUnder') => {
   const dx = target.x - origin.x;
   const dy = target.y - origin.y;
 

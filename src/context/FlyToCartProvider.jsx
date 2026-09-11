@@ -5,6 +5,8 @@ import {
   FLY_EASING,
   buildCartBumpKeyframes,
   buildFlightKeyframes,
+  centerOf,
+  getFlightOrigin,
   getFlightSize,
   getFlightStyle,
   pickFlightPath,
@@ -19,18 +21,31 @@ import { FlyToCartContext } from './FlyToCartContext';
  * one to clear it — instead of one per frame.
  *
  * @param {Object} props - Component props.
- * @param {Object} props.flight - The flight description (image and rectangles).
+ * @param {Object} props.flight - The flight description (image, origin and target).
  * @param {Function} props.onLanded - Stable callback, given the flight id once the disc reaches the cart.
  */
 function FlyingItem({ flight, onLanded }) {
   const elementRef = useRef(null);
+  const imageRef = useRef(null);
+  // The disc is a product, so there is no point flying it before there is a
+  // product to see. Held back until the image is decoded, otherwise an
+  // uncached one launches as a blank white circle and fills in mid-flight.
+  const [isImageReady, setIsImageReady] = useState(false);
+
+  // A cached image can finish before React attaches its load handler, in which
+  // case onLoad never fires. Catch that case on mount.
+  useEffect(() => {
+    if (imageRef.current?.complete && imageRef.current.naturalWidth > 0) {
+      setIsImageReady(true);
+    }
+  }, []);
 
   useEffect(() => {
     const element = elementRef.current;
-    if (!element) return undefined;
+    if (!element || !isImageReady) return undefined;
 
     const animation = element.animate(
-      buildFlightKeyframes(flight.originRect, flight.targetRect, flight.path),
+      buildFlightKeyframes(flight.origin, flight.target, flight.path),
       { duration: FLY_DURATION_MS, easing: FLY_EASING, fill: 'forwards' }
     );
 
@@ -46,16 +61,27 @@ function FlyingItem({ flight, onLanded }) {
     return () => {
       if (!landed) animation.cancel();
     };
-  }, [flight, onLanded]);
+  }, [flight, isImageReady, onLanded]);
 
   return (
     <div
       ref={elementRef}
       aria-hidden="true"
-      className="pointer-events-none z-flyer overflow-hidden rounded-full bg-white shadow-2xl ring-1 ring-black/10"
-      style={getFlightStyle(flight.originRect, flight.size)}
+      className={`pointer-events-none z-flyer overflow-hidden rounded-full bg-white shadow-2xl ring-1 ring-black/10 ${
+        isImageReady ? '' : 'invisible'
+      }`}
+      style={getFlightStyle(flight.origin, flight.size)}
     >
-      <img src={flight.image} alt="" className="h-full w-full object-cover" />
+      <img
+        ref={imageRef}
+        src={flight.image}
+        alt=""
+        className="h-full w-full object-cover"
+        onLoad={() => setIsImageReady(true)}
+        // A broken image would otherwise hold the disc invisible for the whole
+        // flight, and the add behind it. Land it now and let the cart update.
+        onError={() => onLanded(flight.id)}
+      />
     </div>
   );
 }
@@ -98,16 +124,17 @@ export const FlyToCartProvider = ({ children }) => {
     resolve();
   }, []);
 
-  const flyToCart = useCallback(({ image, originRect }) => {
-    const target = cartTargetRef.current;
+  const flyToCart = useCallback(({ image, originRect, pointer }) => {
+    const cartTarget = cartTargetRef.current;
 
     // No image, no destination, or the visitor asked for less motion: the
     // caller carries on immediately and the item is simply added.
-    if (!image || !target || !originRect || prefersReducedMotion()) {
+    if (!image || !cartTarget || !originRect || prefersReducedMotion()) {
       return Promise.resolve();
     }
 
-    const targetRect = target.getBoundingClientRect();
+    const origin = getFlightOrigin(originRect, pointer);
+    const target = centerOf(cartTarget.getBoundingClientRect());
     const id = (nextIdRef.current += 1);
 
     return new Promise((resolve) => {
@@ -129,8 +156,8 @@ export const FlyToCartProvider = ({ children }) => {
         {
           id,
           image,
-          originRect,
-          targetRect,
+          origin,
+          target,
           path: pickFlightPath(),
           size: getFlightSize(window.innerWidth),
         },
