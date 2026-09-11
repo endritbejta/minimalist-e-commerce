@@ -31,7 +31,11 @@ const VARIANTS = {
  * @param {boolean} [props.showPending=false] - Show a spinner while the flight is in the air.
  *   Off by default: on a product card the disc leaving the button is feedback
  *   enough, but somewhere the button is the only thing being looked at, the
- *   wait wants marking.
+ *   wait wants marking. Pointless without a flight to wait on.
+ * @param {boolean} [props.fly=true] - Send a disc to the cart. Turn it off for
+ *   adds made from inside the cart itself: the destination is behind the open
+ *   drawer, so the journey is spent travelling somewhere nobody can see while
+ *   the item it represents waits to appear in the list.
  */
 function BuyButton({
   product,
@@ -41,6 +45,7 @@ function BuyButton({
   variant = "primary",
   onClick,
   showPending = false,
+  fly = true,
   ...props
 }) {
   const { addToCart } = useCart();
@@ -55,8 +60,12 @@ function BuyButton({
     onClick?.(event);
     if (!product) return;
 
-    // Measured now: `currentTarget` is cleared once the handler yields, and the
-    // button may well be gone by the time the flight ends.
+    if (!fly) {
+      addToCart(product, quantity);
+      return;
+    }
+
+    // Measured now: `currentTarget` is cleared once the handler yields.
     const originRect = event.currentTarget.getBoundingClientRect();
 
     if (showPending) setIsPending(true);

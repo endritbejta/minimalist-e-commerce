@@ -15,6 +15,11 @@ import SmartImage from "../UI/SmartImage";
  * The cards do not link anywhere: the point is to add without leaving the
  * cart, and navigating would strand the drawer open over another page.
  *
+ * Adding from here does not fly a disc to the cart either. The cart is already
+ * open in front of it, so the disc would travel to a target hidden behind the
+ * drawer while delaying the thing that actually reads as confirmation: the
+ * product appearing in the list above, and leaving this row.
+ *
  * @param {Object} props - Component props.
  * @param {Object[]} props.products - Products to suggest; renders nothing when empty.
  */
@@ -60,7 +65,7 @@ function CartRecommendations({ products }) {
                                     <BuyButton
                                         product={product}
                                         variant="outline"
-                                        showPending
+                                        fly={false}
                                         className="!rounded-full !px-3 !py-1 !text-[8px] uppercase tracking-widest"
                                         aria-label={`Add ${product.title} to cart`}
                                     >
