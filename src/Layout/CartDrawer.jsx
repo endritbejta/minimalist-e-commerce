@@ -48,7 +48,7 @@ function CartDrawer() {
                 <div className="flex flex-col h-full">
                     <CartDrawerHeader onClose={closeCart} titleId={titleId} />
 
-                    <div className="flex-1 overflow-y-auto p-6">
+                    <div className="flex-1 overflow-y-auto px-4 py-1">
                         {items.length === 0 ? (
                             <CartEmptyState onClose={closeCart} />
                         ) : (

@@ -8,8 +8,8 @@ import AnimatedPrice from "../UI/AnimatedPrice";
  */
 function CartDrawerFooter({ cartTotal }) {
     return (
-        <div className="p-6 border-t bg-gray-50">
-            <div className="flex justify-between items-center mb-6">
+        <div className="px-4 py-4 border-t bg-gray-50">
+            <div className="flex justify-between items-center mb-3">
                 <span className="text-gray-500 uppercase tracking-widest text-xs font-bold">
                     Subtotal
                 </span>
@@ -22,7 +22,7 @@ function CartDrawerFooter({ cartTotal }) {
                 type="button"
                 disabled
                 title="Checkout is not available in this demo"
-                className="w-full bg-black text-white py-4 rounded-full font-bold transition-all shadow-lg mb-3 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full bg-black text-white py-3 rounded-full font-bold transition-all shadow-lg mb-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 Checkout
             </button>

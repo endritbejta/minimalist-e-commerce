@@ -53,9 +53,9 @@ function CartItem({
             }`}
             onAnimationEnd={handleAnimationEnd}
         >
-            <div className="cart-item-content flex gap-4 group py-4">
+            <div className="cart-item-content flex gap-3 group py-3">
                 {/* Item Image */}
-                <div className="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
                     {item.image ? (
                         <SmartImage
                             src={item.image}
@@ -87,11 +87,11 @@ function CartItem({
                                 <BsTrash size={16} />
                             </button>
                         </div>
-                        <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                        <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">
                             {item.collection}
                         </p>
                         {customizationSummary && (
-                            <p className="text-[10px] text-gray-500 mb-2 flex items-start gap-1.5">
+                            <p className="text-[10px] text-gray-500 mb-1 flex items-start gap-1.5">
                                 <span aria-hidden="true">✦</span>
                                 <span className="min-w-0">{customizationSummary}</span>
                             </p>
