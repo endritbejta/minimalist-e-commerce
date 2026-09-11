@@ -35,6 +35,13 @@ describe('getFlightSize', () => {
     // A disc wider than about a fifth of the screen reads as a lump.
     expect(FLY_SIZE_COMPACT_PX / 375).toBeLessThan(0.2);
   });
+
+  it('caps the disc however wide the screen gets', () => {
+    // There is no viewport big enough to grow it past the ceiling.
+    for (const width of [640, 1280, 1920, 3840]) {
+      expect(getFlightSize(width)).toBe(FLY_SIZE_PX);
+    }
+  });
 });
 
 describe('getFlightStyle', () => {

@@ -7,9 +7,13 @@
  */
 
 export const FLY_DURATION_MS = 1000;
-export const FLY_SIZE_PX = 64;
-// A 64px disc is a sixth of a 375px screen, which reads as a lump rather than a
-// product. Phones get a smaller one.
+// The disc never grows past this, however wide the screen gets. It is a token
+// standing in for a product, not a picture of one, so there is nothing to gain
+// from more pixels — past about this size it stops reading as a thing being
+// carried and starts reading as a panel sliding across the page.
+export const FLY_SIZE_PX = 52;
+// A disc much over a tenth of a phone's width reads as a lump rather than a
+// product, so narrow screens get a smaller one again.
 export const FLY_SIZE_COMPACT_PX = 44;
 const COMPACT_VIEWPORT_PX = 640;
 export const FLY_EASING = 'cubic-bezier(.53,.45,.33,1.06)';
