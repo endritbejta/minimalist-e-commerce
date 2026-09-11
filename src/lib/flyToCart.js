@@ -11,10 +11,10 @@ export const FLY_DURATION_MS = 1000;
 // standing in for a product, not a picture of one, so there is nothing to gain
 // from more pixels — past about this size it stops reading as a thing being
 // carried and starts reading as a panel sliding across the page.
-export const FLY_SIZE_PX = 52;
+export const FLY_SIZE_PX = 42;
 // A disc much over a tenth of a phone's width reads as a lump rather than a
 // product, so narrow screens get a smaller one again.
-export const FLY_SIZE_COMPACT_PX = 44;
+export const FLY_SIZE_COMPACT_PX = 37;
 const COMPACT_VIEWPORT_PX = 640;
 export const FLY_EASING = 'cubic-bezier(.53,.45,.33,1.06)';
 
