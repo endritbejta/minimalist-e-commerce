@@ -1,18 +1,22 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
-import AnimatedPrice from "../UI/AnimatedPrice";
+import { formatPrice } from "../../lib/format";
+import AnimatedHeading from "../UI/AnimatedHeading";
 
 // Long enough to read as the code being checked, short enough not to be a wait.
 const CHECK_DURATION_MS = 550;
+// The field clearing out before the saving takes its place.
+const FADE_DURATION_MS = 260;
 
 /**
  * CartCouponField Component
  * The promo code field above the totals.
  *
- * Applying runs through a brief checking state before the result lands. There
- * is nothing to check against — the codes are local — but a code that resolved
- * instantly would read as though nothing had happened, and the pause gives the
- * saving somewhere to arrive from.
+ * Applying runs through three beats: the code is checked, the field fades out,
+ * and the saving reveals in the space the field occupied — the same
+ * character-by-character reveal the hero and collection titles use. There is
+ * nothing to check against, since the codes are local, but a result that
+ * landed instantly would read as though nothing had happened.
  */
 function CartCouponField() {
     const { coupon, discount, applyCoupon, removeCoupon } = useCart();
@@ -20,74 +24,85 @@ function CartCouponField() {
 
     const [code, setCode] = useState('');
     const [status, setStatus] = useState('idle');
-    const [savingShown, setSavingShown] = useState(0);
-    const checkTimerRef = useRef(null);
+    // Only an application made here earns the reveal; a coupon restored from a
+    // previous visit is simply already applied.
+    const [justApplied, setJustApplied] = useState(false);
+    const timersRef = useRef([]);
 
-    useEffect(() => () => window.clearTimeout(checkTimerRef.current), []);
-
-    // Count the saving up from zero once it has been revealed, rather than
-    // having the figure simply appear at its final value.
     useEffect(() => {
-        if (status !== 'applied' || discount <= 0) return undefined;
-
-        const frame = requestAnimationFrame(() => setSavingShown(discount));
-        return () => cancelAnimationFrame(frame);
-    }, [status, discount]);
+        const timers = timersRef.current;
+        return () => timers.forEach(window.clearTimeout);
+    }, []);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (!code.trim() || status === 'checking') return;
+        if (!code.trim() || status !== 'idle') return;
 
         setStatus('checking');
-        checkTimerRef.current = window.setTimeout(() => {
-            if (applyCoupon(code)) {
+        timersRef.current.push(
+            window.setTimeout(() => {
+                if (!applyCoupon(code)) {
+                    setStatus('rejected');
+                    return;
+                }
+
+                // The coupon is on, but the field stays mounted a moment longer
+                // so it can fade rather than vanish.
                 setCode('');
-                setStatus('applied');
-            } else {
-                setStatus('rejected');
-            }
-        }, CHECK_DURATION_MS);
+                setStatus('fading');
+                timersRef.current.push(
+                    window.setTimeout(() => {
+                        setJustApplied(true);
+                        setStatus('idle');
+                    }, FADE_DURATION_MS)
+                );
+            }, CHECK_DURATION_MS)
+        );
     };
 
     const handleRemove = () => {
         removeCoupon();
-        setSavingShown(0);
+        setJustApplied(false);
         setStatus('idle');
     };
 
     const isChecking = status === 'checking';
     const isRejected = status === 'rejected';
+    const isFading = status === 'fading';
 
-    if (coupon) {
+    if (coupon && !isFading) {
+        const savedText = `You saved ${formatPrice(discount)}`;
+
         return (
             <div className="mb-3">
                 <p className="mb-2 text-xs font-bold text-gray-900">Promo Code</p>
 
-                <div className="flex items-center justify-between gap-2 rounded-full border border-gray-900 py-2.5 pl-5 pr-2">
-                    <span className="min-w-0 truncate text-sm font-bold uppercase tracking-widest text-gray-900">
-                        {coupon.code}
-                    </span>
+                <div className="flex min-h-[46px] items-center justify-between gap-3">
+                    {justApplied ? (
+                        <AnimatedHeading
+                            as="p"
+                            remember={false}
+                            stagger={0.025}
+                            className="text-base font-bold text-gray-900"
+                        >
+                            {savedText}
+                        </AnimatedHeading>
+                    ) : (
+                        <p className="text-base font-bold text-gray-900">{savedText}</p>
+                    )}
+
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="flex-shrink-0 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                        className="flex-shrink-0 rounded-full px-2 py-1 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                     >
                         Remove
                     </button>
                 </div>
 
-                {discount > 0 && (
-                    <p
-                        role="status"
-                        className="mt-2 flex items-center gap-1.5 text-xs font-bold text-gray-900 animate-fadeIn"
-                    >
-                        <span aria-hidden="true">✦</span>
-                        <span>
-                            You saved <AnimatedPrice value={savingShown} />
-                        </span>
-                        <span className="font-medium text-gray-400">({coupon.label})</span>
-                    </p>
-                )}
+                <p className="text-[10px] uppercase tracking-widest text-gray-400">
+                    {coupon.code} &middot; {coupon.label}
+                </p>
             </div>
         );
     }
@@ -98,7 +113,10 @@ function CartCouponField() {
                 Promo Code
             </label>
 
-            <form onSubmit={handleSubmit} className="relative">
+            <form
+                onSubmit={handleSubmit}
+                className={`relative transition-opacity duration-200 ${isFading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+            >
                 <input
                     id={inputId}
                     name="coupon"
@@ -140,11 +158,11 @@ function CartCouponField() {
                 </div>
             </form>
 
-            {/* One region for both outcomes, so a screen reader hears the result
-                of applying without the field having to move focus. */}
+            {/* The reveal is decorative; this is what actually gets announced. */}
             <p role="status" aria-live="polite" className="sr-only">
                 {isChecking ? 'Checking code' : ''}
                 {isRejected ? 'That code is not recognised' : ''}
+                {isFading ? `Coupon applied. You saved ${formatPrice(discount)}` : ''}
             </p>
 
             {isRejected && (
@@ -152,7 +170,6 @@ function CartCouponField() {
                     That code isn&rsquo;t recognised.
                 </p>
             )}
-
         </div>
     );
 }
