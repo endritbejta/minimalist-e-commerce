@@ -61,7 +61,7 @@ function CartRecommendations({ products }) {
                                         product={product}
                                         variant="outline"
                                         showPending
-                                        className="!rounded-full px-3 py-1 text-[9px] uppercase tracking-widest"
+                                        className="!rounded-full !px-3 !py-1 !text-[8px] uppercase tracking-widest"
                                         aria-label={`Add ${product.title} to cart`}
                                     >
                                         Add
