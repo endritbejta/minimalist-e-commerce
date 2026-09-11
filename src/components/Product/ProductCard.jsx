@@ -48,13 +48,24 @@ const ProductCard = memo(({ product, delay = 0, priority = false }) => {
           <ProductMedia image={getPrimaryImage(product)} title={product.title} priority={priority} />
         </Link>
 
+        {/*
+          The padding is the touch target and the inner circle is the visible
+          control. At p-1 around a 16px icon this was a 24px target — half the
+          44px a finger needs — so a near miss hit the card link underneath and
+          navigated to the product page instead of opening the quick view.
+        */}
         <button
           type="button"
           onClick={handleQuickView}
-          className="absolute top-1 right-1 md:top-2 md:right-2 p-1 md:p-2 bg-black/10 rounded-full text-white transition-all duration-300 shadow-sm z-10 scale-95 hover:scale-105 mix-blend-difference focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="group absolute top-0 right-0 p-2.5 z-10 text-white transition-transform duration-300 hover:scale-105 mix-blend-difference focus-visible:outline-none"
           aria-label={`Quick view: ${product.title}`}
         >
-          <IoEyeOutline size={16} className="md:w-[20px] md:h-[20px]" />
+          {/* Rounding lives on the circle, not the button: a rounded-full
+              button is hit-tested as a circle, so taps near the corners of its
+              box fell through to the card link. */}
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black/10 shadow-sm group-focus-visible:ring-2 group-focus-visible:ring-black">
+            <IoEyeOutline size={20} />
+          </span>
         </button>
       </div>
 
