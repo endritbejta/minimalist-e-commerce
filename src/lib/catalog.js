@@ -71,3 +71,27 @@ export const getPrimaryImage = (product) =>
  */
 export const getDisplayPrice = (product, variant) =>
   variant?.price ?? product?.price ?? 0;
+
+/**
+ * Products worth suggesting alongside what is already in the cart.
+ *
+ * Anything already in the cart is excluded — suggesting what someone has just
+ * added is noise — and products sharing a collection with the cart's contents
+ * come first, so the row reads as related rather than arbitrary.
+ *
+ * @param {Object[]} [cartItems=[]] - The current cart lines.
+ * @param {number} [limit=8] - Most suggestions to return.
+ * @returns {Object[]} Suggested products, related ones first.
+ */
+export const getRecommendations = (cartItems = [], limit = 8) => {
+  const inCart = new Set(cartItems.map((item) => item.id));
+  const cartCollections = new Set(
+    cartItems.map((item) => item.collection).filter(Boolean)
+  );
+
+  const candidates = products.filter((product) => !inCart.has(product.id));
+  const related = candidates.filter((product) => cartCollections.has(product.collection));
+  const rest = candidates.filter((product) => !cartCollections.has(product.collection));
+
+  return [...related, ...rest].slice(0, limit);
+};

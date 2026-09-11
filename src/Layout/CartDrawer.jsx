@@ -1,12 +1,14 @@
 import { useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useCart } from "../context/CartContext";
+import { getRecommendations } from "../lib/catalog";
 import useDialog from "../hooks/useDialog";
 import useScrollLock from "../hooks/useScrollLock";
 import CartDrawerFooter from "../components/Cart/CartDrawerFooter";
 import CartDrawerHeader from "../components/Cart/CartDrawerHeader";
 import CartEmptyState from "../components/Cart/CartEmptyState";
 import CartItemsList from "../components/Cart/CartItemsList";
+import CartRecommendations from "../components/Cart/CartRecommendations";
 
 /**
  * CartDrawer Component
@@ -15,9 +17,11 @@ import CartItemsList from "../components/Cart/CartItemsList";
  * order and the accessibility tree while it is off-screen.
  */
 function CartDrawer() {
-    const { isOpen, closeCart, items, cartTotal, removeFromCart } = useCart();
+    const { isOpen, closeCart, items, cartTotal, discount, orderTotal, removeFromCart } = useCart();
     const drawerRef = useRef(null);
     const titleId = useId();
+
+    const recommendations = getRecommendations(items);
 
     useScrollLock(isOpen);
     useDialog({ isOpen, onClose: closeCart, containerRef: drawerRef });
@@ -52,11 +56,14 @@ function CartDrawer() {
                         {items.length === 0 ? (
                             <CartEmptyState onClose={closeCart} />
                         ) : (
-                            <CartItemsList items={items} onRemoveItem={removeFromCart} />
+                            <>
+                                <CartItemsList items={items} onRemoveItem={removeFromCart} />
+                                <CartRecommendations products={recommendations} />
+                            </>
                         )}
                     </div>
 
-                    {items.length > 0 && <CartDrawerFooter cartTotal={cartTotal} />}
+                    {items.length > 0 && <CartDrawerFooter cartTotal={cartTotal} discount={discount} orderTotal={orderTotal} />}
                 </div>
             </div>
         </>,
