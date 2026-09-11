@@ -52,18 +52,28 @@ function CartDrawer() {
                 <div className="flex flex-col h-full">
                     <CartDrawerHeader onClose={closeCart} titleId={titleId} />
 
-                    <div className="flex-1 overflow-y-auto px-4 py-1">
+                    {/* Only the lines scroll. The suggestions and the totals
+                        stay put beneath them, so both are reachable however
+                        long the cart gets. min-h-0 lets this actually shrink
+                        inside the flex column rather than pushing them off. */}
+                    <div className="flex-1 min-h-0 overflow-y-auto px-4 py-1">
                         {items.length === 0 ? (
                             <CartEmptyState onClose={closeCart} />
                         ) : (
-                            <>
-                                <CartItemsList items={items} onRemoveItem={removeFromCart} />
-                                <CartRecommendations products={recommendations} />
-                            </>
+                            <CartItemsList items={items} onRemoveItem={removeFromCart} />
                         )}
                     </div>
 
-                    {items.length > 0 && <CartDrawerFooter cartTotal={cartTotal} discount={discount} orderTotal={orderTotal} />}
+                    {items.length > 0 && (
+                        <>
+                            <CartRecommendations products={recommendations} />
+                            <CartDrawerFooter
+                                cartTotal={cartTotal}
+                                discount={discount}
+                                orderTotal={orderTotal}
+                            />
+                        </>
+                    )}
                 </div>
             </div>
         </>,

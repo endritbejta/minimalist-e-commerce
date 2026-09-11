@@ -17,19 +17,20 @@ function CartRecommendations({ products }) {
     if (!products || products.length === 0) return null;
 
     return (
-        <section aria-labelledby="cart-recommendations" className="border-t pt-4 mt-2">
+        <section aria-labelledby="cart-recommendations" className="flex-shrink-0 border-t px-4 py-3">
             <h3
                 id="cart-recommendations"
-                className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3"
+                className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2"
             >
                 You might also like
             </h3>
 
-            {/* Negative margin lets the row bleed to the drawer edges while the
-                padding keeps the first and last tiles clear of them. */}
-            <ul className="flex gap-3 overflow-x-auto snap-x hide-scrollbar -mx-4 px-4 pb-1 list-none m-0">
+            {/* Inset to the same gutter as the lines above and the totals
+                below, so the row sits in the cart's column rather than running
+                out to the drawer edges. */}
+            <ul className="flex gap-3 overflow-x-auto snap-x hide-scrollbar list-none p-0 m-0">
                 {products.map((product) => (
-                    <li key={product.id} className="w-28 flex-shrink-0 snap-start">
+                    <li key={product.id} className="w-24 flex-shrink-0 snap-start">
                         <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
                             <SmartImage
                                 src={getPrimaryImage(product)}
@@ -38,14 +39,15 @@ function CartRecommendations({ products }) {
                                 imgClassName="h-full w-full object-cover"
                             />
                         </div>
-                        <p className="mt-2 truncate text-xs font-medium text-gray-900" title={product.title}>
+                        <p className="mt-1.5 truncate text-[11px] font-medium leading-tight text-gray-900" title={product.title}>
                             {product.title}
                         </p>
-                        <p className="text-xs font-bold text-gray-900">{formatPrice(product.price)}</p>
+                        <p className="text-[11px] font-bold text-gray-900">{formatPrice(product.price)}</p>
                         <BuyButton
                             product={product}
                             variant="outline"
-                            className="mt-2 w-full py-1.5 text-[10px] uppercase tracking-widest"
+                            showPending
+                            className="mt-1.5 w-full py-1 text-[10px] uppercase tracking-widest"
                             aria-label={`Add ${product.title} to cart`}
                         >
                             Add

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useFlyToCart } from "../../context/FlyToCartContext";
 import { getPrimaryImage } from "../../lib/catalog";
@@ -27,6 +28,10 @@ const VARIANTS = {
  * @param {import('react').ReactNode} props.children - Button label/content.
  * @param {"primary"|"secondary"|"outline"|"ghost"} [props.variant="primary"] - Button style variant.
  * @param {Function} [props.onClick] - Optional extra click handler, run on click.
+ * @param {boolean} [props.showPending=false] - Show a spinner while the flight is in the air.
+ *   Off by default: on a product card the disc leaving the button is feedback
+ *   enough, but somewhere the button is the only thing being looked at, the
+ *   wait wants marking.
  */
 function BuyButton({
   product,
@@ -35,10 +40,12 @@ function BuyButton({
   children,
   variant = "primary",
   onClick,
+  showPending = false,
   ...props
 }) {
   const { addToCart } = useCart();
   const { flyToCart } = useFlyToCart();
+  const [isPending, setIsPending] = useState(false);
 
   const handleClick = async (event) => {
     // Cards wrap their content in links; adding to the cart must not navigate.
@@ -52,9 +59,12 @@ function BuyButton({
     // button may well be gone by the time the flight ends.
     const originRect = event.currentTarget.getBoundingClientRect();
 
+    if (showPending) setIsPending(true);
     await flyToCart({ image: getPrimaryImage(product), originRect });
-
     addToCart(product, quantity);
+    // The button is often gone by now — adding can remove it from a list of
+    // suggestions — and setting state on an unmounted component is a no-op.
+    if (showPending) setIsPending(false);
   };
 
   return (
@@ -62,9 +72,21 @@ function BuyButton({
       type="button"
       {...props}
       onClick={handleClick}
+      disabled={isPending}
+      aria-busy={isPending || undefined}
       className={`${BASE_STYLES} ${VARIANTS[variant] ?? VARIANTS.primary} ${className}`}
     >
-      {children || "Add to Cart"}
+      {isPending ? (
+        <span className="flex items-center justify-center">
+          <span
+            className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent opacity-60"
+            aria-hidden="true"
+          />
+          <span className="sr-only">Adding</span>
+        </span>
+      ) : (
+        children || "Add to Cart"
+      )}
     </button>
   );
 }
