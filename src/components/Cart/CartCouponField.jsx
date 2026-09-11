@@ -74,10 +74,14 @@ function CartCouponField() {
         const savedText = `You saved ${formatPrice(discount)}`;
 
         return (
-            <div className="mb-3">
-                <p className="mb-2 text-xs font-bold text-gray-900">Promo Code</p>
+            <div className="mb-4">
+                <p className="mb-0.5 text-xs font-bold text-gray-900">Promo Code</p>
 
-                <div className="flex min-h-[46px] items-center justify-between gap-3">
+                {/* No min-height here: matching the input's height only bought
+                    11px of dead space above and below the figure, which made
+                    the label and caption drift as far from it as the totals
+                    below. AnimatedHeading brings its own py-1 for the clip. */}
+                <div className="flex items-center justify-between gap-3">
                     {justApplied ? (
                         <AnimatedHeading
                             as="p"
@@ -88,19 +92,22 @@ function CartCouponField() {
                             {savedText}
                         </AnimatedHeading>
                     ) : (
-                        <p className="text-base font-bold text-gray-900">{savedText}</p>
+                        // py-1 matches what AnimatedHeading adds for its clip,
+                        // so a restored coupon sits exactly where a freshly
+                        // applied one does.
+                        <p className="py-1 text-base font-bold text-gray-900">{savedText}</p>
                     )}
 
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="flex-shrink-0 rounded-full px-2 py-1 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                        className="flex-shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-900 underline decoration-gray-300 underline-offset-4 transition-colors hover:decoration-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                     >
                         Remove
                     </button>
                 </div>
 
-                <p className="text-[10px] uppercase tracking-widest text-gray-400">
+                <p className="-mt-0.5 text-[10px] uppercase tracking-widest text-gray-400">
                     {coupon.code} &middot; {coupon.label}
                 </p>
             </div>
@@ -108,7 +115,7 @@ function CartCouponField() {
     }
 
     return (
-        <div className="mb-3">
+        <div className="mb-4">
             <label htmlFor={inputId} className="mb-2 block text-xs font-bold text-gray-900">
                 Promo Code
             </label>
