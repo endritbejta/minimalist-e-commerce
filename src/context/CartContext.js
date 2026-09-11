@@ -24,7 +24,12 @@ import { createContext, use } from 'react';
  * @property {(lineId: string) => void} removeFromCart - Removes a line.
  * @property {() => void} clearCart - Removes all cart lines.
  * @property {number} cartCount - Sum of all line quantities.
- * @property {number} cartTotal - Sum of all line prices multiplied by quantity.
+ * @property {number} cartTotal - Sum of all line prices multiplied by quantity, before any discount.
+ * @property {Object|null} coupon - The applied discount code, when one is active.
+ * @property {(code: string) => boolean} applyCoupon - Applies a code; returns whether it was recognised.
+ * @property {() => void} removeCoupon - Clears the applied code.
+ * @property {number} discount - Amount the coupon takes off.
+ * @property {number} orderTotal - What is actually payable: cartTotal less discount.
  */
 
 export const CartContext = createContext(undefined);

@@ -9,17 +9,17 @@ import { BsX } from "react-icons/bs";
  */
 function CartDrawerHeader({ onClose, titleId }) {
     return (
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between items-center px-4 py-3 border-b">
             <h2 id={titleId} className="text-xl font-bold uppercase tracking-tight">
                 Shopping Bag
             </h2>
             <button
                 type="button"
                 onClick={onClose}
-                className="p-3 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Close cart"
             >
-                <BsX size={28} />
+                <BsX size={24} />
             </button>
         </div>
     );

@@ -55,7 +55,6 @@ function CollectionGrid({ products, title }) {
       <AnimatedHeading
         as="h1"
         type="reveal"
-        toggleOnce={false}
         className="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-4 lg:mb-8 text-gray-900 py-2"
       >
         {title}

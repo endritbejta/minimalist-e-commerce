@@ -1,12 +1,14 @@
 import { useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useCart } from "../context/CartContext";
+import { getRecommendations } from "../lib/catalog";
 import useDialog from "../hooks/useDialog";
 import useScrollLock from "../hooks/useScrollLock";
 import CartDrawerFooter from "../components/Cart/CartDrawerFooter";
 import CartDrawerHeader from "../components/Cart/CartDrawerHeader";
 import CartEmptyState from "../components/Cart/CartEmptyState";
 import CartItemsList from "../components/Cart/CartItemsList";
+import CartRecommendations from "../components/Cart/CartRecommendations";
 
 /**
  * CartDrawer Component
@@ -15,9 +17,11 @@ import CartItemsList from "../components/Cart/CartItemsList";
  * order and the accessibility tree while it is off-screen.
  */
 function CartDrawer() {
-    const { isOpen, closeCart, items, cartTotal, removeFromCart } = useCart();
+    const { isOpen, closeCart, items, cartTotal, discount, orderTotal, removeFromCart } = useCart();
     const drawerRef = useRef(null);
     const titleId = useId();
+
+    const recommendations = getRecommendations(items);
 
     useScrollLock(isOpen);
     useDialog({ isOpen, onClose: closeCart, containerRef: drawerRef });
@@ -48,7 +52,11 @@ function CartDrawer() {
                 <div className="flex flex-col h-full">
                     <CartDrawerHeader onClose={closeCart} titleId={titleId} />
 
-                    <div className="flex-1 overflow-y-auto p-6">
+                    {/* Only the lines scroll. The suggestions and the totals
+                        stay put beneath them, so both are reachable however
+                        long the cart gets. min-h-0 lets this actually shrink
+                        inside the flex column rather than pushing them off. */}
+                    <div className="flex-1 min-h-0 overflow-y-auto px-4 py-1">
                         {items.length === 0 ? (
                             <CartEmptyState onClose={closeCart} />
                         ) : (
@@ -56,7 +64,16 @@ function CartDrawer() {
                         )}
                     </div>
 
-                    {items.length > 0 && <CartDrawerFooter cartTotal={cartTotal} />}
+                    {items.length > 0 && (
+                        <>
+                            <CartRecommendations products={recommendations} />
+                            <CartDrawerFooter
+                                cartTotal={cartTotal}
+                                discount={discount}
+                                orderTotal={orderTotal}
+                            />
+                        </>
+                    )}
                 </div>
             </div>
         </>,

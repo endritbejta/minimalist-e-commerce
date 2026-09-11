@@ -5,6 +5,7 @@
  * the provider module exports only a component (which Fast Refresh requires).
  */
 import { createCartLine, getCartLineId, sanitizeCartItems } from './cart';
+import { findCoupon } from './coupons';
 
 export const CART_STORAGE_KEY = 'shopping-cart-v2';
 export const DEFAULT_QUANTITY = 1;
@@ -12,16 +13,24 @@ export const DEFAULT_QUANTITY = 1;
 export const initialCartState = {
   isOpen: false,
   items: [],
+  coupon: null,
 };
 
 // Only the basket itself is durable. `isOpen` is view state — persisting it
 // meant a returning visitor was greeted by an open drawer over a frozen page.
-export const persistCart = (state) => ({ items: state.items });
+export const persistCart = (state) => ({ items: state.items, coupon: state.coupon });
 
-export const hydrateCart = (stored, defaults) => ({
-  ...defaults,
-  items: sanitizeCartItems(stored?.items),
-});
+export const hydrateCart = (stored, defaults) => {
+  const items = sanitizeCartItems(stored?.items);
+
+  return {
+    ...defaults,
+    items,
+    // Re-resolved from the code rather than trusted as stored: the percentage
+    // must come from the catalog, not from whatever is in localStorage.
+    coupon: items.length > 0 ? findCoupon(stored?.coupon?.code) ?? null : null,
+  };
+};
 
 const toQuantity = (value) => {
   const parsed = Math.trunc(Number(value));
@@ -62,11 +71,10 @@ export const cartReducer = (state, action) => {
         items: [...state.items, createCartLine(action.payload, quantity)],
       };
     }
-    case 'REMOVE_FROM_CART':
-      return {
-        ...state,
-        items: state.items.filter((item) => item.lineId !== action.payload),
-      };
+    case 'REMOVE_FROM_CART': {
+      const remaining = state.items.filter((item) => item.lineId !== action.payload);
+      return { ...state, items: remaining, coupon: remaining.length > 0 ? state.coupon : null };
+    }
     case 'UPDATE_QUANTITY': {
       const { lineId, amount } = action.payload;
       const quantityChange = Math.trunc(Number(amount));
@@ -83,10 +91,20 @@ export const cartReducer = (state, action) => {
         )
         .filter((item) => item.quantity > 0);
 
-      return { ...state, items: updatedItems };
+      return {
+        ...state,
+        items: updatedItems,
+        coupon: updatedItems.length > 0 ? state.coupon : null,
+      };
     }
+    case 'APPLY_COUPON': {
+      const coupon = findCoupon(action.payload);
+      return coupon ? { ...state, coupon } : state;
+    }
+    case 'REMOVE_COUPON':
+      return { ...state, coupon: null };
     case 'CLEAR_CART':
-      return { ...state, items: [] };
+      return { ...state, items: [], coupon: null };
     default:
       return state;
   }

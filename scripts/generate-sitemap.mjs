@@ -29,15 +29,15 @@ const paths = [
   ...products.map((product) => `/products/${product.handle}`),
 ];
 
-const lastmod = new Date().toISOString().split('T')[0];
-
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${paths
   .map(
+    // No <lastmod>: it is optional, and stamping today's date on every entry
+    // at build time rewrote the whole file on each build — churn in the diff
+    // for a claim that was not true anyway.
     (path) => `  <url>
     <loc>${SITE_URL}${path}</loc>
-    <lastmod>${lastmod}</lastmod>
   </url>`
   )
   .join('\n')}

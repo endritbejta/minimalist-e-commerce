@@ -102,6 +102,88 @@ describe('cartReducer', () => {
   });
 });
 
+describe('coupons', () => {
+  const withItem = () => add(initialCartState, black);
+
+  it('applies a code however it was typed', () => {
+    const state = cartReducer(withItem(), { type: 'APPLY_COUPON', payload: 'minimal10' });
+    expect(state.coupon?.code).toBe('MINIMAL10');
+  });
+
+  it('ignores a code it does not recognise', () => {
+    const before = withItem();
+    expect(cartReducer(before, { type: 'APPLY_COUPON', payload: 'NOPE' })).toBe(before);
+  });
+
+  it('drops the coupon once the last item is removed', () => {
+    const state = cartReducer(withItem(), { type: 'APPLY_COUPON', payload: 'MINIMAL10' });
+    const { lineId } = state.items[0];
+
+    const emptied = cartReducer(state, { type: 'REMOVE_FROM_CART', payload: lineId });
+
+    expect(emptied.items).toHaveLength(0);
+    expect(emptied.coupon).toBeNull();
+  });
+
+  it('drops the coupon when the last item is decremented away', () => {
+    const state = cartReducer(withItem(), { type: 'APPLY_COUPON', payload: 'MINIMAL10' });
+    const { lineId } = state.items[0];
+
+    const emptied = cartReducer(state, {
+      type: 'UPDATE_QUANTITY',
+      payload: { lineId, amount: -1 },
+    });
+
+    expect(emptied.coupon).toBeNull();
+  });
+
+  it('keeps the coupon while other items remain', () => {
+    let state = add(add(initialCartState, black), red);
+    state = cartReducer(state, { type: 'APPLY_COUPON', payload: 'MINIMAL10' });
+
+    const next = cartReducer(state, { type: 'REMOVE_FROM_CART', payload: state.items[0].lineId });
+
+    expect(next.items).toHaveLength(1);
+    expect(next.coupon?.code).toBe('MINIMAL10');
+  });
+
+  it('clears the coupon along with the cart', () => {
+    const state = cartReducer(withItem(), { type: 'APPLY_COUPON', payload: 'MINIMAL10' });
+    expect(cartReducer(state, { type: 'CLEAR_CART' }).coupon).toBeNull();
+  });
+
+  it('re-resolves a stored coupon from the catalog rather than trusting it', () => {
+    // localStorage is the shopper's to edit, so a stored percentage is not
+    // evidence of anything — only the code is, and the discount comes from us.
+    const restored = hydrateCart(
+      {
+        items: [{ lineId: 'a', title: 'Thing', price: 10, quantity: 1 }],
+        coupon: { code: 'MINIMAL10', percentOff: 99 },
+      },
+      initialCartState
+    );
+
+    expect(restored.coupon.percentOff).toBe(10);
+  });
+
+  it('does not restore a coupon onto an empty cart', () => {
+    const restored = hydrateCart({ items: [], coupon: { code: 'MINIMAL10' } }, initialCartState);
+    expect(restored.coupon).toBeNull();
+  });
+
+  it('discards a stored code that no longer exists', () => {
+    const restored = hydrateCart(
+      {
+        items: [{ lineId: 'a', title: 'Thing', price: 10, quantity: 1 }],
+        coupon: { code: 'RETIRED2019', percentOff: 90 },
+      },
+      initialCartState
+    );
+
+    expect(restored.coupon).toBeNull();
+  });
+});
+
 describe('cart persistence', () => {
   it('does not persist the drawer open state', () => {
     // A persisted `isOpen: true` meant the site loaded with the cart drawer
