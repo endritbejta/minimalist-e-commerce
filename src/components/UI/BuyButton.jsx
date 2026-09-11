@@ -67,9 +67,12 @@ function BuyButton({
 
     // Measured now: `currentTarget` is cleared once the handler yields.
     const originRect = event.currentTarget.getBoundingClientRect();
+    // `detail` is 0 for a keyboard activation, which reports no coordinates —
+    // those fall back to the middle of the button.
+    const pointer = event.detail > 0 ? { x: event.clientX, y: event.clientY } : undefined;
 
     if (showPending) setIsPending(true);
-    await flyToCart({ image: getPrimaryImage(product), originRect });
+    await flyToCart({ image: getPrimaryImage(product), originRect, pointer });
     addToCart(product, quantity);
     // The button is often gone by now — adding can remove it from a list of
     // suggestions — and setting state on an unmounted component is a no-op.
