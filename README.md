@@ -96,6 +96,9 @@ This is a portfolio demo, not a shop:
 
 - No backend — checkout is disabled, and the contact/newsletter forms only
   confirm locally.
+- Discount codes are checked in the browser against `lib/coupons.js`, so they
+  are visible to and editable by anyone using the site. Real discounts have to
+  be validated server-side. `MINIMAL10` and `ESSENTIALS20` work in the demo.
 - Product photography is placeholder imagery from Unsplash. The t-shirt colour
   variants all share one photo, so the swatches change the selection but not the
   picture.

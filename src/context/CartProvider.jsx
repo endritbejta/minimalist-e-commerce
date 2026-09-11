@@ -8,6 +8,7 @@ import {
   initialCartState,
   persistCart,
 } from '../lib/cartReducer';
+import { findCoupon, getDiscountAmount } from '../lib/coupons';
 import { CartContext } from './CartContext';
 
 /**
@@ -44,6 +45,17 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = useCallback(() => dispatch({ type: 'CLEAR_CART' }), [dispatch]);
 
+  /**
+   * @param {string} code - The code the shopper typed.
+   * @returns {boolean} Whether it was recognised.
+   */
+  const applyCoupon = useCallback((code) => {
+    dispatch({ type: 'APPLY_COUPON', payload: code });
+    return Boolean(findCoupon(code));
+  }, [dispatch]);
+
+  const removeCoupon = useCallback(() => dispatch({ type: 'REMOVE_COUPON' }), [dispatch]);
+
   const { cartCount, cartTotal } = useMemo(
     () =>
       state.items.reduce(
@@ -56,9 +68,16 @@ export const CartProvider = ({ children }) => {
     [state.items]
   );
 
+  const discount = getDiscountAmount(cartTotal, state.coupon);
+  const orderTotal = cartTotal - discount;
+
   const value = useMemo(
     () => ({
       ...state,
+      applyCoupon,
+      removeCoupon,
+      discount,
+      orderTotal,
       toggleCart,
       openCart,
       closeCart,
@@ -71,6 +90,10 @@ export const CartProvider = ({ children }) => {
     }),
     [
       state,
+      applyCoupon,
+      removeCoupon,
+      discount,
+      orderTotal,
       toggleCart,
       openCart,
       closeCart,
