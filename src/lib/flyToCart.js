@@ -58,75 +58,79 @@ export const getFlightOrigin = (originRect, pointer) => pointer ?? centerOf(orig
 const RECOIL_FRACTION = 0.18;
 
 /**
- * Reflects a point across the straight line from the button to the cart.
- * Mirroring a low route this way produces its exact counterpart above the line,
- * so an inverted route keeps the character of the one it came from.
- * @param {{x: number, y: number}} point - The point to reflect.
- * @param {number} dx - Horizontal distance to the cart.
- * @param {number} dy - Vertical distance to the cart.
- * @returns {{x: number, y: number}} The reflected point.
+ * How far the flight bows away from the straight line to the cart.
+ *
+ * Scaled to the journey rather than to the wind-up, which is capped: a card
+ * sitting just below the header has a short trip, and a bow sized for a
+ * full-page journey would throw the disc off the bottom of the screen on its
+ * way somewhere a few inches above.
+ *
+ * @param {number} distance - Straight-line distance from the button to the cart.
+ * @returns {number} The bow depth, in pixels.
  */
-const mirrorAcrossPath = (point, dx, dy) => {
-  const lengthSquared = dx * dx + dy * dy;
-  if (lengthSquared === 0) return { ...point };
-
-  const projection = (point.x * dx + point.y * dy) / lengthSquared;
-
-  return {
-    x: 2 * projection * dx - point.x,
-    y: 2 * projection * dy - point.y,
-  };
-};
+const getDipDepth = (distance) => Math.min(260, distance * 0.25);
 
 /**
- * The two shapes every route is built from, in a space where the button sits at
- * (0, 0), the cart at (dx, dy), and y grows downward — so the cart is usually at
- * a negative y and "dipping down" means a positive one.
+ * The wind-up: where the disc pulls back to before it sets off, and the control
+ * that bends that retreat into a curve — a straight slide reads as the disc
+ * slipping rather than being drawn back.
  *
- * Both drop beneath the button and run low before climbing into the cart; they
- * differ in how deep the dip is and how late the climb comes.
- *
- * A shape is two phases. First the disc pulls back to `recoil`, away from the
- * cart, as a wind-up. Then it travels from there along a cubic Bézier shaped by
- * `controls`. Doing the recoil as its own phase, rather than as a backward
- * control point on one long curve, is what makes it visible at all — a single
- * Bézier absorbs the backward pull into the forward swing.
+ * Two of them drop and two lift, so the pull-back already tells you which way
+ * the disc is about to go: the routes that swing low wind up downward, and the
+ * ones that arc over lift instead. Every one of them still retreats
+ * horizontally away from the cart, which is what makes it read as a wind-up
+ * rather than as the flight starting early.
  *
  * `back` is the wind-up distance and `awayX` points horizontally away from the
  * cart.
  */
-const BASE_SHAPES = {
-  // Drops deepest, then climbs steeply at the end.
-  dip: {
-    recoil: (back, awayX) => ({ x: awayX * back * 0.45, y: back * 1.15 }),
-    controls: (dx, dy, back) => [
-      { x: dx * 0.15, y: back * 1.4 },
-      { x: dx * 1.05, y: dy * 0.12 },
-    ],
+const WIND_UPS = {
+  drop: {
+    settle: (back, awayX) => ({ x: awayX * back * 0.45, y: back * 1.15 }),
+    control: (back, awayX) => ({ x: awayX * back * 0.7, y: back * 0.3 }),
   },
-  // A shallower dip held further across, with an even later climb.
-  dipHeld: {
-    recoil: (back, awayX) => ({ x: awayX * back * 0.5, y: back * 0.8 }),
-    controls: (dx, dy, back) => [
-      { x: dx * 0.4, y: back * 1.1 },
-      { x: dx * 1.14, y: dy * 0.04 },
-    ],
+  dropShallow: {
+    settle: (back, awayX) => ({ x: awayX * back * 0.5, y: back * 0.8 }),
+    control: (back, awayX) => ({ x: awayX * back * 0.75, y: back * 0.2 }),
+  },
+  lift: {
+    settle: (back, awayX) => ({ x: awayX * back * 0.45, y: -back * 0.95 }),
+    control: (back, awayX) => ({ x: awayX * back * 0.7, y: -back * 0.22 }),
+  },
+  // Retreats before it lifts, rather than doing both at once: the control sits
+  // further back than the settle and a shade *below* the button, so the disc
+  // slides away almost level and only then swings up. It leaves at about 5
+  // degrees where `lift` leaves at 30, which is what keeps the two arcing
+  // routes from opening the same way.
+  liftShallow: {
+    settle: (back, awayX) => ({ x: awayX * back * 0.55, y: -back * 0.72 }),
+    control: (back, awayX) => ({ x: awayX * back * 0.95, y: back * 0.1 }),
   },
 };
 
 /**
- * The routes. Two run below the line of travel; the other two are those same
- * two reflected across it, so they arc above instead — the same motion turned
- * upside down rather than a different idea.
+ * The four routes, as the two control points of the flight's curve.
  *
- * Only the flight is mirrored. The wind-up stays a pull back and down for every
- * route, so the gesture that starts the animation always reads the same way.
+ * Each is `[along, offLine]`: how far along the line from the button to the
+ * cart, and how far to the side of it — in multiples of the dip depth, positive
+ * above the line. Stating them against the line rather than as raw x and y
+ * multipliers is what makes the shapes legible, and it is what the two upper
+ * routes needed.
+ *
+ * Those two used to be the lower pair reflected across the line. It was a tidy
+ * idea, but the page is not symmetric: there is open room below a product card,
+ * while above the cart there is the header edge and then nothing. A reflected
+ * dip therefore launched the disc near-vertically out of the button and sailed
+ * it over the header before dropping in. They are their own shapes now — first
+ * control low and well along, so the disc leaves along the line and curves up
+ * rather than shooting off it, and second control placed early enough that the
+ * descent into the cart begins around two-thirds of the way across.
  */
 const ROUTES = {
-  dipUnder: { shape: BASE_SHAPES.dip },
-  dipLate: { shape: BASE_SHAPES.dipHeld },
-  archOver: { shape: BASE_SHAPES.dip, inverted: true },
-  archEarly: { shape: BASE_SHAPES.dipHeld, inverted: true },
+  dipUnder: { windUp: WIND_UPS.drop, controls: [[0.22, -1.55], [0.72, -0.42]] },
+  dipLate: { windUp: WIND_UPS.dropShallow, controls: [[0.52, -1.7], [0.84, -0.22]] },
+  archOver: { windUp: WIND_UPS.lift, controls: [[0.5, 0.6], [0.54, 1.15]] },
+  archEarly: { windUp: WIND_UPS.liftShallow, controls: [[0.38, 0.75], [0.48, 1.3]] },
 };
 
 /**
@@ -157,6 +161,16 @@ export const getFlightStyle = (origin, size = FLY_SIZE_PX) => {
     top: `${origin.y - size / 2}px`,
     width: `${size}px`,
     height: `${size}px`,
+  };
+};
+
+// Quadratic Bézier through three points.
+const quadraticAt = (u, p0, p1, p2) => {
+  const m = 1 - u;
+
+  return {
+    x: m * m * p0.x + 2 * m * u * p1.x + u * u * p2.x,
+    y: m * m * p0.y + 2 * m * u * p1.y + u * u * p2.y,
   };
 };
 
@@ -196,12 +210,28 @@ export const buildFlightKeyframes = (origin, target, path = 'dipUnder') => {
   const awayX = -Math.sign(dx || 1);
 
   const route = ROUTES[path] ?? ROUTES.dipUnder;
-  const recoil = route.shape.recoil(back, awayX);
-  const controls = route.shape.controls(dx, dy, back);
-  const [c1, c2] = route.inverted
-    ? controls.map((point) => mirrorAcrossPath(point, dx, dy))
-    : controls;
+  const recoil = route.windUp.settle(back, awayX);
+  const recoilControl = route.windUp.control(back, awayX);
+
+  // The unit vector along the line to the cart. The zero guard is for a button
+  // sitting exactly on the cart, which has no direction to speak of.
+  const safeDistance = distance || 1;
+  const ux = dx / safeDistance;
+  const uy = dy / safeDistance;
+  const dip = getDipDepth(distance);
+
+  /**
+   * A point `along` the way to the cart and `offLine` to the side of it,
+   * measured in dip depths, positive above the line.
+   */
+  const chordAt = (along, offLine) => ({
+    x: dx * along + uy * offLine * dip,
+    y: dy * along - ux * offLine * dip,
+  });
+
+  const [c1, c2] = route.controls.map(([along, offLine]) => chordAt(along, offLine));
   const destination = { x: dx, y: dy };
+  const ORIGIN = { x: 0, y: 0 };
 
   return Array.from({ length: SAMPLE_COUNT }, (_, index) => {
     const t = index / (SAMPLE_COUNT - 1);
@@ -209,10 +239,10 @@ export const buildFlightKeyframes = (origin, target, path = 'dipUnder') => {
     let scale;
 
     if (t <= RECOIL_FRACTION) {
-      // Wind-up: ease out into the pull-back, swelling slightly as it loads.
+      // Wind-up: ease out along the pull-back curve, swelling as it loads.
       const u = t / RECOIL_FRACTION;
       const eased = 1 - (1 - u) * (1 - u);
-      point = { x: recoil.x * eased, y: recoil.y * eased };
+      point = quadraticAt(eased, ORIGIN, recoilControl, recoil);
       scale = 1 + 0.08 * eased;
     } else {
       // Flight: from the wound-up position to the cart.
