@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { BsCartCheck, BsList } from "react-icons/bs";
 import { useCart } from "../context/CartContext";
 import { useFlyToCart } from "../context/FlyToCartContext";
+import useMediaQuery from "../hooks/useMediaQuery";
 import { COLLECTIONS } from "../lib/catalog";
 import { SITE } from "../lib/site";
 import MobileMenu from "./MobileMenu";
@@ -12,13 +13,29 @@ const navLinkClasses = ({ isActive }) =>
     isActive ? "text-black" : "text-gray-500 hover:text-black transition-colors";
 
 /**
+ * Tailwind's `lg`, the width at which the full nav replaces the menu button.
+ * It is stated here as well as in the `lg:hidden` / `hidden lg:flex` classes
+ * below because the menu's open state has to respect the same line the layout
+ * does: a menu left open while the page switches to the desktop nav would hold
+ * the scroll lock over a page with no visible way to release it.
+ */
+const DESKTOP_NAV_QUERY = "(min-width: 1024px)";
+
+/**
  * Header Component
  * The primary navigation bar, featuring the logo, desktop menu, search trigger, and cart toggle.
  */
 function Header() {
     const { toggleCart, cartCount } = useCart();
     const { registerCartTarget } = useFlyToCart();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuRequested, setIsMenuRequested] = useState(false);
+    const isDesktopNav = useMediaQuery(DESKTOP_NAV_QUERY);
+
+    // Derived rather than corrected in an effect: widening the window past the
+    // breakpoint takes the menu button away, and the menu it opened has to go
+    // with it in the same render — not one paint later, holding the scroll lock
+    // over a page whose only way to release it has just disappeared.
+    const isMenuOpen = isMenuRequested && !isDesktopNav;
 
     return (
         <header className="flex items-center gap-2 px-3 py-2 lg:px-5 lg:py-4 border-b sticky top-0 bg-white z-header">
@@ -31,7 +48,7 @@ function Header() {
             <div className="flex flex-1 items-center lg:hidden">
                 <button
                     type="button"
-                    onClick={() => setIsMenuOpen(true)}
+                    onClick={() => setIsMenuRequested(true)}
                     className="p-2 hover:bg-gray-100 rounded-full"
                     aria-label="Open menu"
                     aria-expanded={isMenuOpen}
@@ -101,7 +118,7 @@ function Header() {
                 </button>
             </div>
 
-            <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+            <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuRequested(false)} />
         </header>
     );
 }
