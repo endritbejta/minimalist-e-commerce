@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatPrice, humanizeSlug } from './format';
+import { formatPrice, formatPriceCompact, humanizeSlug } from './format';
 
 describe('formatPrice', () => {
   it('renders two decimals everywhere', () => {
@@ -25,5 +25,23 @@ describe('humanizeSlug', () => {
   it('handles an empty slug', () => {
     expect(humanizeSlug('')).toBe('');
     expect(humanizeSlug()).toBe('');
+  });
+});
+
+describe('formatPriceCompact', () => {
+  it('drops the pence on a round amount', () => {
+    expect(formatPriceCompact(100)).toBe('$100');
+    expect(formatPriceCompact(0)).toBe('$0');
+  });
+
+  it('keeps the pence when there are any', () => {
+    // Rounding 99.50 to "$100" in prose would overstate a threshold by 50c.
+    expect(formatPriceCompact(99.5)).toBe('$99.50');
+    expect(formatPriceCompact(6.05)).toBe('$6.05');
+  });
+
+  it('falls back to the standard format for nonsense', () => {
+    expect(formatPriceCompact('abc')).toBe('$0.00');
+    expect(formatPriceCompact(undefined)).toBe('$0.00');
   });
 });

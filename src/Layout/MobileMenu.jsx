@@ -11,7 +11,15 @@ const linkClasses = ({ isActive }) =>
 
 /**
  * MobileMenu Component
- * A full-screen overlay menu for mobile navigation.
+ * The slide-out navigation drawer, shown below the desktop nav breakpoint.
+ *
+ * Nothing here hides itself at a breakpoint. It used to, at `md`, while the
+ * button that opens it was shown until `lg` — so between 768px and 1024px a
+ * click locked the page scroll behind a drawer that was `display: none`, with
+ * the desktop nav also hidden and no navigation left on the page. The Header
+ * closes the menu when the desktop nav takes over, so the open state is the
+ * only thing that decides whether this is on screen.
+ *
  * @param {Object} props - Component props.
  * @param {boolean} props.isOpen - Whether the menu is visible.
  * @param {Function} props.onClose - Function to close the menu.
@@ -27,7 +35,7 @@ function MobileMenu({ isOpen, onClose }) {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-menu-backdrop transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-menu-backdrop transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -41,7 +49,7 @@ function MobileMenu({ isOpen, onClose }) {
         aria-modal="true"
         aria-labelledby={titleId}
         inert={!isOpen}
-        className={`fixed left-0 top-0 w-[80%] max-w-sm h-full bg-white z-menu shadow-2xl transition-transform duration-500 ease-in-out transform md:hidden ${
+        className={`fixed left-0 top-0 w-[80%] max-w-sm h-full bg-white z-menu shadow-2xl transition-transform duration-500 ease-in-out transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

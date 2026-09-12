@@ -11,6 +11,9 @@ import { products } from '../src/data/products.js';
 
 const SITE_URL = 'https://endrits-e-commerce.netlify.app';
 
+// /checkout and /orders/:id are deliberately absent: both are private,
+// cart-dependent pages that render noindex, and a crawler arriving at either
+// with no cart and no order sees nothing worth having indexed.
 const STATIC_PATHS = [
   '/',
   '/shipping-policy',

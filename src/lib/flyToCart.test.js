@@ -154,16 +154,28 @@ describe('buildFlightKeyframes', () => {
     expect(scaleOf(frames.at(-1))).toBeLessThan(0.2);
   });
 
-  // How far each sample sits off the straight line from button to cart.
-  // Positive is below that line, negative above it.
-  const deviationsFrom = (path) => {
-    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
-    const dx = 960;
-    const dy = -584;
-    const lengthSquared = dx * dx + dy * dy;
+  const DX = 960;
+  const DY = -584;
+  const LENGTH = Math.hypot(DX, DY);
 
-    return points.map((p) => p.y - ((p.x * dx + p.y * dy) / lengthSquared) * dy);
-  };
+  /**
+   * Each sample as how far along the line to the cart it sits, and how far off
+   * that line. Positive `off` is below the line, negative above it.
+   *
+   * Measured against distance travelled rather than against the keyframe index:
+   * "near the cart" is a place, not a moment, and the two part company on a
+   * curve that covers ground unevenly.
+   */
+  const samplesFrom = (path) =>
+    pointsOf(buildFlightKeyframes(FROM, TO, path)).map((p) => ({
+      along: (p.x * DX + p.y * DY) / (LENGTH * LENGTH),
+      off: p.y - ((p.x * DX + p.y * DY) / (LENGTH * LENGTH)) * DY,
+    }));
+
+  const deviationsFrom = (path) => samplesFrom(path).map((s) => s.off);
+
+  // Where the flight proper begins, once the wind-up has finished.
+  const flightOnly = (path) => samplesFrom(path).filter((s) => s.along > 0);
 
   it.each(['dipUnder', 'dipLate'])('%s runs below the straight line', (path) => {
     const deviations = deviationsFrom(path);
@@ -177,16 +189,117 @@ describe('buildFlightKeyframes', () => {
     expect(deviations[Math.floor(deviations.length / 2)]).toBeLessThan(0);
   });
 
-  it('builds the arcing routes as reflections of the dipping ones', () => {
-    // archOver is dipUnder mirrored, so their swings away from the line should
-    // be comparable in size and opposite in sign.
-    const low = deviationsFrom('dipUnder');
-    const high = deviationsFrom('archOver');
+  it('swings the four routes by comparable amounts', () => {
+    // The arcing routes are no longer the dipping ones reflected — the page is
+    // not symmetric enough for that — but they should still read as one family
+    // rather than as two big curves and two timid ones.
+    const swings = FLIGHT_PATHS.map((path) =>
+      Math.max(...deviationsFrom(path).map(Math.abs))
+    );
 
-    expect(Math.max(...low)).toBeGreaterThan(0);
-    expect(Math.min(...high)).toBeLessThan(0);
-    // Equal magnitudes on opposite sides sum to roughly zero.
-    expect(Math.abs(Math.max(...low) + Math.min(...high))).toBeLessThan(40);
+    expect(Math.min(...swings) / Math.max(...swings)).toBeGreaterThan(0.6);
+  });
+
+  it.each(['archOver', 'archEarly'])('%s never climbs above the cart', (path) => {
+    // The cart sits in the header, so there is nothing above it to fly through.
+    // Reflecting a dip used to sail the disc up over the header before dropping
+    // it back down; `y` here is relative to the button, and the cart is at -584.
+    const highest = Math.min(...pointsOf(buildFlightKeyframes(FROM, TO, path)).map((p) => p.y));
+
+    expect(highest).toBeGreaterThanOrEqual(-584);
+  });
+
+  it.each(['archOver', 'archEarly'])('%s leaves along the line, not straight off it', (path) => {
+    const flight = flightOnly(path);
+    const [first, second] = flight;
+
+    // How much ground it covers toward the cart over its first step, against
+    // how far it moves sideways. A near-vertical launch out of the button
+    // barely advances and swings a long way off.
+    const advance = (second.along - first.along) * LENGTH;
+    const sideways = Math.abs(second.off - first.off);
+
+    expect(advance).toBeGreaterThan(sideways);
+  });
+
+  it.each(FLIGHT_PATHS)('%s comes into the cart close to straight', (path) => {
+    const samples = samplesFrom(path);
+    const peak = Math.max(...samples.map((s) => Math.abs(s.off)));
+    const tail = Math.max(
+      ...samples.filter((s) => s.along > 0.85).map((s) => Math.abs(s.off))
+    );
+
+    // The disc used to still be most of its widest swing off the line with a
+    // sixth of the ground left, so it arrived hooking sideways into the cart
+    // instead of running into it.
+    expect(tail / peak).toBeLessThan(0.5);
+  });
+
+  it('winds up downward on two routes and upward on the other two', () => {
+    // The pull-back tells you which way the disc is about to go: the routes
+    // that swing low drop into it, the ones that arc over lift instead.
+    const windUpEnd = (path) => {
+      const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
+      return points[Math.ceil(points.length * 0.18)].y;
+    };
+
+    // y grows downward, so a positive end means the disc dropped.
+    const dropped = FLIGHT_PATHS.filter((path) => windUpEnd(path) > 0);
+    const lifted = FLIGHT_PATHS.filter((path) => windUpEnd(path) < 0);
+
+    expect(dropped).toEqual(['dipUnder', 'dipLate']);
+    expect(lifted).toEqual(['archOver', 'archEarly']);
+  });
+
+  it('opens archEarly by going back, not by rising', () => {
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, 'archEarly'));
+    const windUp = points.slice(0, Math.ceil(points.length * 0.18) + 1);
+    const furthestBack = windUp.reduce((a, b) => (b.x < a.x ? b : a));
+    const totalLift = -windUp.at(-1).y;
+
+    // By the time it is as far back as it gets, most of the lift should still
+    // be ahead of it. Rising in lockstep with the retreat reads as the disc
+    // setting off upward rather than being drawn back first.
+    expect(-furthestBack.y / totalLift).toBeLessThan(0.45);
+
+    // And the very first movement is near enough level.
+    const [, first] = windUp;
+    expect(Math.abs(first.y)).toBeLessThan(Math.abs(first.x) * 0.25);
+  });
+
+  it('opens the two arcing routes differently', () => {
+    // archOver lifts as it retreats; archEarly slides back and then lifts. If
+    // both opened the same way there would be no reason to have two.
+    const opening = (path) => {
+      const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
+      const [, first] = points;
+      return Math.abs(Math.atan2(-first.y, -first.x) * (180 / Math.PI));
+    };
+
+    expect(opening('archOver') - opening('archEarly')).toBeGreaterThan(15);
+  });
+
+  it.each(FLIGHT_PATHS)('%s still retreats from the cart however it winds up', (path) => {
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
+
+    // Lifting instead of dropping must not turn the wind-up into an early
+    // start: the horizontal retreat is what makes it read as a wind-up at all.
+    expect(-Math.min(...points.map((p) => p.x))).toBeGreaterThan(20);
+  });
+
+  it.each(FLIGHT_PATHS)('%s curves through the wind-up instead of sliding back', (path) => {
+    const points = pointsOf(buildFlightKeyframes(FROM, TO, path));
+    const windUp = points.slice(0, Math.ceil(points.length * 0.18) + 1);
+    const settled = windUp.at(-1);
+    const chord = Math.hypot(settled.x, settled.y);
+
+    // How far the pull-back bows off the straight chord to where it ends up.
+    // A linear retreat sits exactly on that chord and measures zero.
+    const bow = Math.max(
+      ...windUp.map((p) => Math.abs((p.x * settled.y - p.y * settled.x) / chord))
+    );
+
+    expect(bow).toBeGreaterThan(10);
   });
 
   it('falls back to a known route when handed an unknown one', () => {

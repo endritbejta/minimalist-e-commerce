@@ -71,6 +71,7 @@ function CartDrawer() {
                                 cartTotal={cartTotal}
                                 discount={discount}
                                 orderTotal={orderTotal}
+                                onCheckout={closeCart}
                             />
                         </>
                     )}
