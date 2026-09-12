@@ -4,7 +4,8 @@ import { useCustomization } from "../../context/CustomizationContext";
 import { useModal } from "../../context/ModalContext";
 import { getDisplayPrice, getPrimaryImage } from "../../lib/catalog";
 import { describeCustomization } from "../../lib/emblem";
-import { formatPrice } from "../../lib/format";
+import { formatPrice, formatPriceCompact } from "../../lib/format";
+import { FREE_SHIPPING_THRESHOLD } from "../../lib/checkout";
 import AnimatedHeading from "../UI/AnimatedHeading";
 import BuyButton from "../UI/BuyButton";
 import QuantitySelector from "../UI/QuantitySelector";
@@ -12,7 +13,12 @@ import ProductCustomizer from "./ProductCustomizer";
 import VariantSwatches from "./VariantSwatches";
 
 const GUARANTEES = [
-  { title: 'Free Shipping', detail: 'On all orders over $100' },
+  // The figure comes from the checkout that will honour it, not from copy that
+  // can quietly stop being true.
+  {
+    title: 'Free Shipping',
+    detail: `On all orders over ${formatPriceCompact(FREE_SHIPPING_THRESHOLD)}`,
+  },
   { title: 'Returns', detail: '30-day money back guarantee' },
   { title: 'Secure Payment', detail: 'SSL encrypted checkout' },
   { title: 'Support', detail: '24/7 dedicated assistance' },

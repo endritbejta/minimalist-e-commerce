@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import CheckoutLayout from './Layout/CheckoutLayout.jsx';
 import MainLayout from './Layout/MainLayout.jsx';
 
 // Route components are code-split. MainLayout's Suspense boundary renders the
@@ -7,6 +8,8 @@ import MainLayout from './Layout/MainLayout.jsx';
 const Home = lazy(() => import('./App.jsx'));
 const CollectionPage = lazy(() => import('./pages/CollectionPage.jsx'));
 const ProductPage = lazy(() => import('./pages/ProductPage.jsx'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage.jsx'));
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage.jsx'));
 const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy.jsx'));
 const ReturnsPolicy = lazy(() => import('./pages/ReturnsPolicy.jsx'));
 const FAQ = lazy(() => import('./pages/FAQ.jsx'));
@@ -28,6 +31,7 @@ export default function AppRoutes() {
         <Route path="/collections/:handle" element={<CollectionPage />} />
         <Route path="/products" element={<Navigate to="/collections/all" replace />} />
         <Route path="/products/:productHandle" element={<ProductPage />} />
+        <Route path="/orders/:orderNumber" element={<OrderConfirmationPage />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/returns-exchanges" element={<ReturnsPolicy />} />
         <Route path="/faq" element={<FAQ />} />
@@ -35,6 +39,12 @@ export default function AppRoutes() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {/* Its own shell: no nav, no search, no cart icon. Everything in the site
+          header is an invitation to leave a purchase half-finished. */}
+      <Route element={<CheckoutLayout />}>
+        <Route path="/checkout" element={<CheckoutPage />} />
       </Route>
     </Routes>
   );

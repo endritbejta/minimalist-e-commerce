@@ -71,7 +71,11 @@ function CartCouponField() {
     const isFading = status === 'fading';
 
     if (coupon && !isFading) {
-        const savedText = `You saved ${formatPrice(discount)}`;
+        // A free-shipping code takes nothing off the goods, and what it will
+        // take off delivery is not known until a method is chosen — so it
+        // announces what it is rather than claiming a saving of $0.00.
+        const savedText = discount > 0 ? `You saved ${formatPrice(discount)}` : coupon.label;
+        const captionText = discount > 0 ? coupon.label : 'Applied at checkout';
 
         return (
             <div className="mb-4">
@@ -108,7 +112,7 @@ function CartCouponField() {
                 </div>
 
                 <p className="-mt-0.5 text-[10px] uppercase tracking-widest text-gray-400">
-                    {coupon.code} &middot; {coupon.label}
+                    {coupon.code} &middot; {captionText}
                 </p>
             </div>
         );
@@ -169,7 +173,11 @@ function CartCouponField() {
             <p role="status" aria-live="polite" className="sr-only">
                 {isChecking ? 'Checking code' : ''}
                 {isRejected ? 'That code is not recognised' : ''}
-                {isFading ? `Coupon applied. You saved ${formatPrice(discount)}` : ''}
+                {isFading
+                    ? `Coupon applied. ${
+                          discount > 0 ? `You saved ${formatPrice(discount)}` : coupon?.label ?? ''
+                      }`
+                    : ''}
             </p>
 
             {isRejected && (

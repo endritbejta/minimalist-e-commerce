@@ -9,7 +9,9 @@
 export const COUPONS = [
   { code: 'MINIMAL10', percentOff: 10, label: '10% off' },
   { code: 'ESSENTIALS20', percentOff: 20, label: '20% off' },
-  { code: 'FREESHIP', percentOff: 0, label: 'Free shipping' },
+  // Takes nothing off the goods; `freeShipping` is what this code is for, and
+  // it is read at checkout by `getShippingCost`.
+  { code: 'FREESHIP', percentOff: 0, label: 'Free shipping', freeShipping: true },
 ];
 
 const normalize = (code) => String(code ?? '').trim().toUpperCase();

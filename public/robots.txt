@@ -2,5 +2,10 @@
 User-agent: *
 Allow: /
 
+# Private, cart-dependent pages. They also render a noindex tag, but a crawler
+# that does not run JavaScript would never see it.
+Disallow: /checkout
+Disallow: /orders/
+
 # Sitemaps
 Sitemap: https://endrits-e-commerce.netlify.app/sitemap.xml

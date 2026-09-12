@@ -22,6 +22,27 @@ export const formatPrice = (value) => {
   return priceFormatter.format(Number.isFinite(amount) ? amount : 0);
 };
 
+const wholePriceFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+/**
+ * Formats a price for prose, dropping the pence on a round amount.
+ * "Free shipping on orders over $100" reads better than "over $100.00"; an
+ * amount with pence in it still shows them, so nothing is ever rounded away.
+ * @param {number|string} value - The amount to format.
+ * @returns {string} A localized currency string, e.g. "$100" or "$99.50".
+ */
+export const formatPriceCompact = (value) => {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return formatPrice(amount);
+
+  return Number.isInteger(amount) ? wholePriceFormatter.format(amount) : formatPrice(amount);
+};
+
 /**
  * Converts a slug into a human-readable title, e.g. "wireless-trackpad" -> "Wireless Trackpad".
  * @param {string} slug - The slug to humanize.

@@ -1,5 +1,7 @@
 import Breadcrumbs from '../components/UI/Breadcrumbs';
 import SEO from '../components/UI/SEO';
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_METHODS } from '../lib/checkout';
+import { formatPrice, formatPriceCompact } from '../lib/format';
 
 /**
  * ShippingPolicy Component
@@ -18,7 +20,27 @@ function ShippingPolicy() {
         </section>
         <section>
           <h2 className="text-xl font-bold text-black mb-3">Shipping Rates & Estimates</h2>
-          <p>Shipping charges for your order will be calculated and displayed at checkout. We offer free standard shipping on all orders over $100.</p>
+          <p>
+            Shipping charges for your order will be calculated and displayed at
+            checkout. We offer free standard shipping on all orders over{' '}
+            {formatPriceCompact(FREE_SHIPPING_THRESHOLD)}.
+          </p>
+          {/* Listed from the same table the checkout prices against, so the
+              rates quoted here cannot fall behind the ones charged. */}
+          <ul className="mt-4 space-y-2">
+            {SHIPPING_METHODS.map((method) => (
+              <li key={method.id} className="flex justify-between gap-4 border-b pb-2">
+                <span>
+                  <span className="font-bold text-black">{method.label}</span>
+                  {' — '}
+                  {method.description}
+                </span>
+                <span className="tabular-nums whitespace-nowrap">
+                  {formatPrice(method.price)}
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
         <section>
           <h2 className="text-xl font-bold text-black mb-3">International Shipping</h2>

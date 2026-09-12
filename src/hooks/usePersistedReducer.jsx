@@ -1,17 +1,8 @@
 import { useEffect, useReducer, useRef } from "react";
+import getStorage from "../lib/storage";
 
 const identity = (value) => value;
 const warn = (message) => console.warn(message);
-
-const getLocalStorage = () => {
-  try {
-    if (typeof window === "undefined" || !window.localStorage) return null;
-    return window.localStorage;
-  } catch {
-    // Access itself throws when the browser blocks site data.
-    return null;
-  }
-};
 
 const getErrorMessage = (error) =>
   error instanceof Error ? error.message : String(error);
@@ -45,7 +36,7 @@ function usePersistedReducer(reducer, initialState, storageKey, options = {}) {
   } = options;
 
   const [state, dispatch] = useReducer(reducer, initialState, (defaultVal) => {
-    const storage = getLocalStorage();
+    const storage = getStorage();
     if (!storage) return defaultVal;
 
     try {
@@ -62,7 +53,7 @@ function usePersistedReducer(reducer, initialState, storageKey, options = {}) {
   const lastWrittenRef = useRef(null);
 
   useEffect(() => {
-    const storage = getLocalStorage();
+    const storage = getStorage();
     if (!storage) return;
 
     try {
